@@ -1,0 +1,57 @@
+/* main.css — Estilos globales */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;600&family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+  --gold: #FFD700;
+  --night-blue: #1a1a2e;
+  --accent-red: #e94560;
+  --dark-bg: #0f0f1a;
+  --light-text: #f5f5f5;
+  --gold-light: #FFF3B0;
+  
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Poppins', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--dark-bg);
+  color: var(--light-text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section-padding {
+  padding: 80px 0;
+}
+
+.text-red { color: var(--accent-red); }
+.text-gold { color: var(--gold); }
+.text-center { text-align: center; }
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+section {
+  position: relative;
+}

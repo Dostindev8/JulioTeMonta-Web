@@ -1,0 +1,316 @@
+/* ================================================================
+   intro.css — Background Carousel + Key Animation
+   Sequence: [BG cycles Rifa↔Civic] → Logo → Key+Typing+CTA
+   ================================================================ */
+
+:root {
+  --gold:       #FFD700;
+  --accent-red: #e94560;
+  --dark-bg:    #0a0a14;
+}
+
+/* ── FULL-SCREEN CONTAINER ───────────────────────────────── */
+#intro {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--dark-bg);
+  z-index: 10000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1s ease;
+}
+
+#intro.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── PARTICLE CANVAS ─────────────────────────────────────── */
+#intro-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ================================================================
+   BACKGROUND CAROUSEL LAYERS — Rifa ↔ Civic crossfade
+   ================================================================ */
+.bg-carousel-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index: 2;
+  /* Smooth crossfade */
+  transition: opacity 1.8s ease;
+  /* Vignette so text stays readable */
+  -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 30%, transparent 100%);
+  mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* Subtle Ken Burns zoom — makes background feel alive */
+#bg-layer-rifa  { animation: kenBurns 8s ease-in-out infinite alternate; }
+#bg-layer-civic { animation: kenBurns 8s ease-in-out infinite alternate-reverse; }
+
+@keyframes kenBurns {
+  0%   { transform: scale(1)    translateX(0); }
+  100% { transform: scale(1.07) translateX(-12px); }
+}
+
+/* ── DARK VIGNETTE OVERLAY ───────────────────────────────── */
+.intro-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(10,10,20,0.1) 0%, rgba(10,10,20,0.80) 70%);
+}
+
+.intro-overlay::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 60vmin; height: 60vmin;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(233,69,96,0.06) 0%, transparent 70%);
+  animation: pulseBg 3.5s ease-in-out infinite;
+}
+@keyframes pulseBg {
+  0%,100% { transform: translate(-50%,-50%) scale(1);   opacity: .5; }
+  50%      { transform: translate(-50%,-50%) scale(1.18); opacity: 1; }
+}
+
+/* ================================================================
+   SLIDE SYSTEM — centered, full-screen
+   ================================================================ */
+.intro-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.94) translateY(30px);
+  transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.22,1,0.36,1);
+}
+
+.intro-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1) translateY(0);
+}
+
+.intro-slide.exit {
+  opacity: 0;
+  transform: scale(1.04) translateY(-28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  pointer-events: none;
+}
+
+/* ── LOGO SLIDE ──────────────────────────────────────────── */
+.slide-logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.slide-logo-wrap img {
+  width: min(68vw, 380px);
+  height: auto;
+  filter: drop-shadow(0 0 28px rgba(255,215,0,0.4));
+  animation: logoGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes logoGlow {
+  0%,100% { filter: drop-shadow(0 0 20px rgba(255,215,0,0.45)) drop-shadow(0 0 50px rgba(255,215,0,0.15)); }
+  50%      { filter: drop-shadow(0 0 38px rgba(255,215,0,0.75)) drop-shadow(0 0 80px rgba(255,215,0,0.3)); }
+}
+
+.slide-logo-tagline {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.72rem, 2vw, 0.92rem);
+  color: rgba(255,255,255,0.48);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+/* ================================================================
+   MAIN CONTENT — Key + Typing + CTA (over the background)
+   ================================================================ */
+.intro-content {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95) translateY(20px);
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22,1,0.36,1);
+}
+
+.intro-content.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1) translateY(0);
+}
+
+/* ── "BIENVENIDOS A" LABEL ───────────────────────────────── */
+.intro-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.7rem, 2vw, 0.9rem);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: rgba(255,215,0,0.6);
+  margin-bottom: 14px;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+}
+.intro-label.visible { opacity: 1; transform: translateY(0); }
+
+/* ── KEY — LARGER ────────────────────────────────────────── */
+#intro-key {
+  /* Bigger: 250px → 380px depending on viewport */
+  width: clamp(250px, 42vmin, 380px);
+  height: auto;
+  opacity: 0;
+  margin-bottom: 28px;
+  will-change: transform, opacity, filter;
+  flex-shrink: 0;
+}
+
+#intro-key.key-entrance {
+  animation: keyEntrance 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+#intro-key.key-glow {
+  animation: keyGlow 2.8s ease-in-out infinite;
+}
+
+@keyframes keyEntrance {
+  0%   {
+    transform: scale(0.15) translateY(-80px) rotate(-30deg);
+    opacity: 0;
+    filter: drop-shadow(0 0 0px rgba(255,215,0,0));
+  }
+  55%  {
+    transform: scale(1.18) translateY(12px) rotate(8deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 40px var(--gold)) drop-shadow(0 0 80px rgba(233,69,96,.65));
+  }
+  78%  {
+    transform: scale(0.97) translateY(-5px) rotate(-3deg);
+    filter: drop-shadow(0 0 20px rgba(255,215,0,.6));
+  }
+  100% {
+    transform: scale(1) translateY(0) rotate(0);
+    opacity: 1;
+    filter: drop-shadow(0 0 22px rgba(255,215,0,.55));
+  }
+}
+
+@keyframes keyGlow {
+  0%,100% {
+    filter: drop-shadow(0 0 14px rgba(255,215,0,.65))
+            drop-shadow(0 0 35px rgba(255,215,0,.28));
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(255,215,0,.95))
+            drop-shadow(0 0 65px rgba(255,165,0,.5));
+    transform: translateY(-10px) scale(1.04);
+  }
+}
+
+/* ── TYPING TEXT ─────────────────────────────────────────── */
+#typing-text {
+  font-family: 'Cinzel', serif;
+  color: #fff;
+  font-size: clamp(1.9rem, 5.5vw, 3.4rem);
+  font-weight: 800;
+  text-shadow: 0 0 20px rgba(255,215,0,.45), 0 2px 12px rgba(0,0,0,.9);
+  margin: 0 0 4px;
+  min-height: 1.3em;
+  letter-spacing: 2px;
+}
+
+#typing-cursor {
+  display: inline-block;
+  width: 3px; height: 1em;
+  background: linear-gradient(var(--gold), #FFA500);
+  margin-left: 5px;
+  animation: blink 0.8s infinite;
+  vertical-align: middle;
+  border-radius: 2px;
+  box-shadow: 0 0 10px var(--gold);
+}
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+
+/* ── CTA BUTTON ──────────────────────────────────────────── */
+#intro-cta {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin-top: 30px;
+}
+
+/* ── FLOATING TICKETS (depth) ────────────────────────────── */
+.ticket {
+  position: absolute;
+  width: 55px; height: 28px;
+  background: url('../assets/svg/ticket.svg') center/contain no-repeat;
+  z-index: 2;
+  opacity: 0;
+  animation: ticketFloat 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes ticketFloat {
+  0%,100% { transform: translateY(0) rotate(var(--rot)); opacity: .4; }
+  50%      { transform: translateY(-22px) rotate(calc(var(--rot) + 15deg)); opacity: .75; }
+}
+
+/* ── BURST PARTICLES (on key reveal) ─────────────────────── */
+.particle {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 6;
+  animation: particleOut 1.5s ease-out forwards;
+}
+@keyframes particleOut {
+  0%   { transform: translate(0,0); opacity:1; }
+  100% {
+    transform: translate(
+      calc(cos(var(--angle)) * var(--distance)),
+      calc(sin(var(--angle)) * var(--distance)));
+    opacity: 0;
+  }
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  #intro-key { width: clamp(180px, 52vw, 280px); }
+  #typing-text { font-size: clamp(1.5rem, 7.5vw, 2.4rem); }
+  .slide-logo-wrap img { width: min(78vw, 320px); }
+}

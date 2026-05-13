@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Boleto | Julio Té Monta</title>
+    <meta name="description" content="Asegura tu boleto para el próximo sorteo de Julio Té Monta.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;600&family=Poppins:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #ff3c3c; /* Reddish base */
+            --gold-glow: #ffcc00; /* Golden glow */
+            --night-blue: #0d0d15;
+            --accent-red: #ff2a4b;
+            --dark-bg: #05050a;
+            --light-text: #ffffff;
+            --gold-light: #ff6b6b;
+            --font-heading: 'Cinzel', serif;
+            --font-body: 'Poppins', sans-serif;
+            --whatsapp: #25D366;
+            --panel-bg: rgba(20, 10, 10, 0.6);
+            --border-glow: rgba(255, 60, 60, 0.3);
+            --red-gold-gradient: linear-gradient(135deg, #ff3c3c 0%, #ffcc00 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: var(--font-heading);
+            text-transform: uppercase;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Canvas Background */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 15, 26, 0.98);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .navbar-ticker {
+            width: 100%;
+            background: var(--red-gold-gradient);
+            padding: 6px 0;
+            overflow: hidden;
+            display: flex;
+            position: relative;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .ticker-wrap {
+            display: flex;
+            white-space: nowrap;
+            animation: tickerScroll 30s linear infinite;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #000;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 50px;
+        }
+
+        .ticker-item b {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .nav-container {
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-logo img {
+            height: 45px;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+        }
+
+        .btn-back {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover {
+            text-shadow: 0 0 10px var(--gold);
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Hero */
+        .page-hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            background: var(--red-gold-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 60, 60, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .page-hero p {
+            color: #aaa;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        /* Steps Indicator */
+        .steps-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 600px;
+            margin: 0 auto 50px;
+            gap: 15px;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            transition: 0.3s;
+        }
+
+        .step.active {
+            color: var(--gold);
+        }
+
+        .step.completed {
+            color: var(--whatsapp);
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #444;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            transition: 0.3s;
+        }
+
+        .step.active .step-circle {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .step.completed .step-circle {
+            background: rgba(37, 211, 102, 0.1);
+            border-color: var(--whatsapp);
+            color: var(--whatsapp);
+        }
+
+        .step span {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: #333;
+            margin-bottom: 25px;
+            transition: 0.3s;
+        }
+
+        .step-line.active {
+            background: var(--gold);
+            box-shadow: 0 0 15px var(--gold);
+        }
+
+        /* Ticket Selector Styles */
+        .ticket-selector-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid var(--border-glow);
+        }
+
+        .ticket-grid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .ticket-legend {
+            display: flex;
+            gap: 15px;
+            font-size: 0.75rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot.available { background: #333; border: 1px solid #555; }
+        .dot.selected { background: var(--gold); box-shadow: 0 0 5px var(--gold); }
+        .dot.sold { background: rgba(255, 255, 255, 0.1); }
+
+        .ticket-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) transparent;
+        }
+
+        .ticket-grid::-webkit-scrollbar { width: 6px; }
+        .ticket-grid::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .ticket-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #888;
+        }
+
+        .ticket-item:hover:not(.sold) {
+            border-color: var(--gold);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .ticket-item.selected {
+            background: var(--red-gold-gradient);
+            border-color: transparent;
+            color: #000;
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        .ticket-item.sold {
+            opacity: 0.15;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.02);
+            border-style: dashed;
+            filter: grayscale(1) blur(0.3px);
+        }
+
+        /* Layout Grid */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .layout-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .panel-right {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Reorder for mobile: Left, Right, Center */
+            .panel-left {
+                order: 1;
+            }
+
+            .panel-right {
+                order: 2;
+                width: 100%;
+            }
+
+            .panel-center {
+                order: 3;
+                width: 100%;
+            }
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Panel Left (Info) */
+        .info-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .info-section h3 {
+            font-size: 1.1rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: #ccc;
+            display: flex;
+            gap: 10px;
+            line-height: 1.4;
+        }
+
+        .prize-preview {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--border-glow);
+        }
+
+        .prize-preview img {
+            border-radius: 6px;
+            margin-bottom: 10px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .prize-preview h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .countdown-box {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(233, 69, 96, 0.3);
+        }
+
+        .cd-item {
+            text-align: center;
+        }
+
+        .cd-value {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            display: block;
+        }
+
+        .cd-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: #888;
+        }
+
+        /* Panel Center (Form) */
+        .panel-center {
+            position: relative;
+            border-color: var(--border-glow);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ddd;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 14px 15px 14px 45px;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .form-input::placeholder {
+            color: #666;
+        }
+
+        .form-input:focus {
+            border-color: var(--gold);
+            outline: none;
+            background: rgba(255, 215, 0, 0.05);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .form-input.highlight {
+            border-color: var(--gold);
+            color: var(--gold);
+            font-weight: 700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .help-text {
+            display: block;
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed rgba(255, 215, 0, 0.4);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            background: rgba(255, 215, 0, 0.02);
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            background: rgba(255, 215, 0, 0.08);
+            border-color: var(--gold);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .upload-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .upload-subtext {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .upload-formats {
+            font-size: 0.75rem;
+            color: #666;
+            display: block;
+        }
+
+        .preview-container {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .remove-file {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(233, 69, 96, 0.9);
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .remove-file:hover {
+            background: #ff2a4b;
+            transform: scale(1.1);
+        }
+
+        .file-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px;
+            font-size: 0.8rem;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-whatsapp {
+            background: var(--whatsapp);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-whatsapp:hover {
+            background: #1ebe57;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-whatsapp:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-save {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            margin-top: 15px;
+        }
+
+        .btn-save:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        /* Panel Right (Banks) */
+        .bank-card {
+            background: linear-gradient(135deg, rgba(255, 60, 60, 0.1) 0%, rgba(255, 204, 0, 0.05) 100%);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bank-card:hover {
+            border-color: var(--gold-glow);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 60, 60, 0.2);
+        }
+
+        .bank-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 60, 60, 0.2);
+        }
+
+        .bank-icon {
+            font-size: 1.5rem;
+        }
+
+        .bank-name {
+            font-weight: 700;
+            font-family: var(--font-heading);
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .bank-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .bank-detail .label {
+            color: #888;
+        }
+
+        .bank-detail .val {
+            color: #ddd;
+            font-weight: 600;
+        }
+
+        .bank-account {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 15px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .acc-num {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gold-glow);
+            letter-spacing: 1px;
+        }
+
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-copy:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .btn-copy.copied {
+            background: var(--whatsapp);
+            color: #fff;
+        }
+
+        /* Error/Validation */
+        .error-msg {
+            color: var(--accent-red);
+            font-size: 0.75rem;
+            position: absolute;
+            bottom: -18px;
+            left: 5px;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .form-group.has-error .form-input {
+            border-color: var(--accent-red);
+            background: rgba(233, 69, 96, 0.05);
+        }
+
+        .form-group.has-error .error-msg {
+            opacity: 1;
+        }
+
+        /* Success Portal Overlay */
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(15, 15, 26, 0.98) 0%, #05050a 100%);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.6s ease;
+            backdrop-filter: blur(15px);
+        }
+
+        .success-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-portal-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 215, 0, 0.05);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            transform: translateY(30px);
+            transition: 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .success-overlay.active .success-portal-card {
+            transform: translateY(0);
+        }
+
+        .portal-logo {
+            height: 60px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+        }
+
+        /* Key Animation */
+        .success-key-wrap {
+            margin: 20px auto;
+            perspective: 1000px;
+        }
+
+        .success-key {
+            width: 140px;
+            height: auto;
+            filter: drop-shadow(0 0 15px var(--gold));
+            animation: keyEntrancePortal 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+                       keyGlowPortal 3s ease-in-out infinite 1.5s;
+        }
+
+        @keyframes keyEntrancePortal {
+            0% { transform: scale(0.1) rotate(-45deg) translateZ(-500px); opacity: 0; }
+            100% { transform: scale(1) rotate(0) translateZ(0); opacity: 1; }
+        }
+
+        @keyframes keyGlowPortal {
+            0%, 100% { filter: drop-shadow(0 0 15px var(--gold)); transform: translateY(0) scale(1); }
+            50% { filter: drop-shadow(0 0 30px var(--gold)); transform: translateY(-10px) scale(1.05); }
+        }
+
+        .success-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 15px;
+            min-height: 2.2rem;
+            background: var(--red-gold-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .success-msg-container {
+            font-size: 1rem;
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            min-height: 80px;
+        }
+
+        .ticket-info-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #777;
+            margin-bottom: 4px;
+        }
+
+        .info-item span {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--red-gold-gradient);
+            width: 100%;
+            transition: width 180s linear;
+        }
+
+        .btn-close-portal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .btn-close-portal:hover {
+            background: var(--accent-red);
+            border-color: transparent;
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 480px) {
+            .success-portal-card { padding: 30px 20px; }
+            .ticket-info-box { grid-template-columns: 1fr; gap: 10px; }
+            .success-title { font-size: 1.5rem; }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #888;
+            margin-top: auto;
+        }
+
+        footer img {
+            height: 40px;
+            margin-bottom: 20px;
+            filter: grayscale(100%);
+            opacity: 0.5;
+        }
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Canvas Background -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-ticker">
+            <div class="ticker-wrap">
+                <div class="ticker-item"><b>PASO 1</b> 🎟️ ELIGE TU NÚMERO</div>
+                <div class="ticker-item"><b>PASO 2</b> 💳 PAGA TU BOLETO</div>
+                <div class="ticker-item"><b>PASO 3</b> 📤 ENVÍA EL COMPROBANTE</div>
+                <div class="ticker-item"><b>PASO 4</b> 🏆 ¡GANA EN VIVO!</div>
+                <!-- Duplicate for seamless loop -->
+                <div class="ticker-item"><b>PASO 1</b> 🎟️ ELIGE TU NÚMERO</div>
+                <div class="ticker-item"><b>PASO 2</b> 💳 PAGA TU BOLETO</div>
+                <div class="ticker-item"><b>PASO 3</b> 📤 ENVÍA EL COMPROBANTE</div>
+                <div class="ticker-item"><b>PASO 4</b> 🏆 ¡GANA EN VIVO!</div>
+                <!-- Triplicate for wider screens -->
+                <div class="ticker-item"><b>PASO 1</b> 🎟️ ELIGE TU NÚMERO</div>
+                <div class="ticker-item"><b>PASO 2</b> 💳 PAGA TU BOLETO</div>
+                <div class="ticker-item"><b>PASO 3</b> 📤 ENVÍA EL COMPROBANTE</div>
+                <div class="ticker-item"><b>PASO 4</b> 🏆 ¡GANA EN VIVO!</div>
+            </div>
+        </div>
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="images/logo.png" alt="Julio Té Monta">
+            </a>
+            <a href="index.html" class="btn-back">
+                <span>←</span> Volver al Inicio
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+
+        <div class="page-hero">
+            <h1>Asegura Tu Boleto</h1>
+            <p>Completa el proceso en 3 simples pasos</p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="steps-progress" id="stepsIndicator">
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <span>Tus Datos</span>
+            </div>
+            <div class="step-line" id="line1"></div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <span>Depósito</span>
+            </div>
+            <div class="step-line" id="line2"></div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <span>Confirmar</span>
+            </div>
+        </div>
+
+        <!-- Grid Layout -->
+        <div class="layout-grid">
+
+            <!-- PANEL LEFT: Process & Info -->
+            <aside class="panel panel-left">
+                <div class="info-section">
+                    <h3>🏆 Premio Seleccionado</h3>
+                    <select id="prizeSelect" class="form-input"
+                        style="background: rgba(0,0,0,0.5); border-color: var(--gold); padding: 10px; font-weight: 600; margin-bottom: 15px; color: #fff;">
+                        <option value="300|GRAN RIFA VILLA ALTAGRACIA" selected>GRAN RIFA VILLA ALTAGRACIA — RD$300</option>
+                        <option value="500|GRAN PREMIO VIP">GRAN PREMIO VIP — RD$500 (Finalizado)</option>
+                        <option value="300|HONDA CIVIC OFICIAL">HONDA CIVIC OFICIAL — RD$300 (Finalizado)</option>
+                    </select>
+                    <div class="prize-preview" style="border-color: var(--gold);">
+                        <img src="images/RifaActual.png" id="prizeImg" alt="Premio">
+                        <h4 id="prizeName">GRAN RIFA VILLA ALTAGRACIA</h4>
+                        <p style="font-size: 0.8rem; color:#aaa;" id="prizeDesc">Mitsubishi Fuso 2023 + Premios</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>⏱️ Próximo Sorteo</h3>
+                    <div class="countdown-box">
+                        <div class="cd-item"><span class="cd-value" id="days">00</span><span
+                                class="cd-label">Días</span></div>
+                        <div class="cd-item"><span class="cd-value" id="hours">00</span><span
+                                class="cd-label">Hrs</span></div>
+                        <div class="cd-item"><span class="cd-value" id="minutes">00</span><span
+                                class="cd-label">Min</span></div>
+                        <div class="cd-item"><span class="cd-value" id="seconds">00</span><span
+                                class="cd-label">Seg</span></div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>💬 Soporte</h3>
+                    <p style="font-size: 0.85rem; color:#aaa; margin-bottom:10px;">¿Dudas con el pago o el proceso?</p>
+                    <a href="https://wa.me/18098280554" target="_blank" class="btn"
+                        style="background: rgba(37,211,102,0.1); color: var(--whatsapp); border: 1px solid rgba(37,211,102,0.3); padding: 10px;">
+                        Contactar WhatsApp
+                    </a>
+                </div>
+            </aside>
+
+            <!-- PANEL CENTER: Form -->
+            <section class="panel panel-center">
+                <form id="purchaseForm" novalidate>
+                    <div class="form-grid">
+
+                        <div class="form-group full">
+                            <label class="form-label">Nombre Completo</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">👤</span>
+                                <input type="text" id="f_nombre" class="form-input" placeholder="Ej: Juan Carlos Pérez"
+                                    required>
+                            </div>
+                            <span class="error-msg">Ingresa tu nombre completo</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Cédula / Pasaporte</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🪪</span>
+                                <input type="text" id="f_cedula" class="form-input" placeholder="000-0000000-0"
+                                    required>
+                            </div>
+                            <span class="error-msg">Formato inválido</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">WhatsApp</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📱</span>
+                                <input type="tel" id="f_telefono" class="form-input" placeholder="(809) 000-0000"
+                                    required>
+                            </div>
+                            <span class="error-msg">Número inválido</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Correo Electrónico (Opcional)</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">✉️</span>
+                                <input type="email" id="f_correo" class="form-input" placeholder="tucorreo@ejemplo.com">
+                            </div>
+                            <span class="error-msg">Correo inválido</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Cant. de Boletos</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🎟️</span>
+                                <input type="number" id="f_cantidad" class="form-input highlight" min="1" max="20"
+                                    value="1" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group full">
+                            <label class="form-label">Elige tus números (500 - 1500)</label>
+                            <div class="ticket-selector-container">
+                                <div class="ticket-grid-header">
+                                    <div id="selectionStatus" style="font-size: 0.85rem; color: var(--gold);">Seleccionados: 0 / 1</div>
+                                    <div class="ticket-legend">
+                                        <div class="legend-item"><span class="dot available"></span> Libre</div>
+                                        <div class="legend-item"><span class="dot selected"></span> Tu Selección</div>
+                                        <div class="legend-item"><span class="dot sold"></span> No Disponible</div>
+                                    </div>
+                                </div>
+                                <div class="ticket-grid" id="ticketGrid">
+                                    <!-- JS will populate -->
+                                </div>
+                                <input type="hidden" id="f_numeros" required>
+                            </div>
+                            <span class="help-text">Haz clic en los números que deseas comprar.</span>
+                            <span class="error-msg">Debes seleccionar la cantidad correcta de números</span>
+                        </div>
+
+                        <div class="form-group full">
+                            <label class="form-label text-gold">Monto a Depositar</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon" style="color:var(--gold)">💰</span>
+                                <input type="text" id="f_monto" class="form-input highlight" style="font-size:1.2rem;"
+                                    readonly value="RD$ 500">
+                            </div>
+                        </div>
+
+                        <div class="form-group full">
+                            <label class="form-label">Foto del Comprobante</label>
+                            <div class="upload-zone" id="uploadZone">
+                                <span class="upload-icon">📎</span>
+                                <div class="upload-text">Sube tu comprobante de pago</div>
+                                <div class="upload-subtext">Arrastra aquí o haz click para seleccionar</div>
+                                <span class="upload-formats">JPG, PNG, PDF — Máx 5MB</span>
+                                <input type="file" id="f_comprobante" accept="image/*,application/pdf" hidden required>
+
+                                <div class="preview-container hidden" id="previewContainer">
+                                    <img id="previewImg" alt="Vista previa">
+                                    <button type="button" class="remove-file" id="removeFileBtn">✕</button>
+                                    <div class="file-name" id="fileName">archivo.jpg</div>
+                                </div>
+                            </div>
+                            <span class="error-msg" style="bottom: -22px;">Debes adjuntar el comprobante</span>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-whatsapp" id="btnSubmit">
+                        <span>📤</span> ENVIAR POR WHATSAPP
+                    </button>
+                    <button type="button" class="btn btn-save" onclick="guardarLocalmente()">
+                        <span>💾</span> Guardar Copia Local
+                    </button>
+                </form>
+            </section>
+
+            <!-- PANEL RIGHT: Banks -->
+            <aside class="panel panel-right">
+                <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 20px;">🏦 Cuentas de Depósito</h3>
+
+                <div class="bank-card">
+                    <div class="bank-header">
+                        <span class="bank-icon">🏦</span>
+                        <span class="bank-name">BANRESERVAS</span>
+                    </div>
+                    <div class="bank-detail"><span class="label">Titular:</span><span class="val">Julio Té Monta</span>
+                    </div>
+                    <div class="bank-detail"><span class="label">Tipo:</span><span class="val">Ahorros</span></div>
+                    <div class="bank-account">
+                        <span class="acc-num" id="cta-res">960-001234-5</span>
+                        <button class="btn-copy" onclick="copiarCuenta('960-001234-5', this)">📋 Copiar</button>
+                    </div>
+                </div>
+
+                <div class="bank-card">
+                    <div class="bank-header">
+                        <span class="bank-icon">🏦</span>
+                        <span class="bank-name">BANCO POPULAR</span>
+                    </div>
+                    <div class="bank-detail"><span class="label">Titular:</span><span class="val">Julio Té Monta</span>
+                    </div>
+                    <div class="bank-detail"><span class="label">Tipo:</span><span class="val">Corriente</span></div>
+                    <div class="bank-account">
+                        <span class="acc-num" id="cta-pop">808-554433-2</span>
+                        <button class="btn-copy" onclick="copiarCuenta('808-554433-2', this)">📋 Copiar</button>
+                    </div>
+                </div>
+
+                <div class="bank-card">
+                    <div class="bank-header">
+                        <span class="bank-icon">🏦</span>
+                        <span class="bank-name">BHD LEÓN</span>
+                    </div>
+                    <div class="bank-detail"><span class="label">Titular:</span><span class="val">Julio Té Monta</span>
+                    </div>
+                    <div class="bank-detail"><span class="label">Tipo:</span><span class="val">Ahorros</span></div>
+                    <div class="bank-account">
+                        <span class="acc-num" id="cta-bhd">213-445566-7</span>
+                        <button class="btn-copy" onclick="copiarCuenta('213-445566-7', this)">📋 Copiar</button>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.8rem; color: #aaa; text-align: center; margin-top: 15px;">
+                    <p>Por favor transfiera el monto exacto auto-calculado.</p>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- Success Portal Overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-portal-card">
+            <button class="btn-close-portal" onclick="window.location.reload()">✕</button>
+            <img src="images/logo.png" alt="Logo" class="portal-logo">
+            
+            <div class="success-key-wrap">
+                <img src="images/llave.png" alt="Llave" class="success-key">
+            </div>
+
+            <h2 class="success-title" id="portalTitle"></h2>
+            
+            <div class="success-msg-container">
+                <p id="portalMsg"></p>
+            </div>
+
+            <div class="ticket-info-box">
+                <div class="info-item">
+                    <label>ID de Registro</label>
+                    <span id="succ_id"></span>
+                </div>
+                <div class="info-item">
+                    <label>Premio</label>
+                    <span id="succ_premio"></span>
+                </div>
+                <div class="info-item">
+                    <label>Boletos</label>
+                    <span id="succ_boletos"></span>
+                </div>
+                <div class="info-item">
+                    <label>Números</label>
+                    <span id="succ_numeros" style="font-size: 0.85rem; color: var(--gold);"></span>
+                </div>
+            </div>
+
+            <div class="timer-bar">
+                <div class="timer-progress" id="timerProgress"></div>
+            </div>
+
+            <p style="font-size: 0.8rem; color: #777;">Esta ventana se cerrará automáticamente en 3 minutos.</p>
+            
+            <button class="btn btn-whatsapp" style="margin-top: 20px;" onclick="window.location.reload()">
+                REALIZAR NUEVA COMPRA
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        <img src="images/logo.png" alt="Julio Té Monta">
+        <p>© 2026 Julio Té Monta. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        // ── 1. BACKGROUND CANVAS (Golden Drift) ──
+        class GoldenParticle {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * this.canvas.width;
+                this.y = Math.random() * this.canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = -(Math.random() * 0.5 + 0.1);
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.2 + 0.05;
+                this.sineVal = Math.random() * Math.PI * 2;
+            }
+            update() {
+                this.sineVal += 0.02;
+                this.x += this.speedX + Math.sin(this.sineVal) * 0.2;
+                this.y += this.speedY;
+                if (this.y < -10 || this.x < -10 || this.x > this.canvas.width + 10) this.reset();
+            }
+            draw() {
+                // Mix red and gold for particles
+                const color = Math.random() > 0.5 ? '#ff3c3c' : '#ffcc00';
+                this.ctx.fillStyle = color;
+                this.ctx.globalAlpha = this.opacity;
+                this.ctx.beginPath();
+                this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.globalAlpha = 1;
+            }
+        }
+
+        const cvs = document.getElementById('bgCanvas');
+        const ctx = cvs.getContext('2d');
+        let particles = [];
+        const isMobile = window.innerWidth < 768;
+        const P_COUNT = isMobile ? 30 : 65;
+
+        function resizeCvs() {
+            cvs.width = window.innerWidth;
+            cvs.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCvs);
+        resizeCvs();
+
+        for (let i = 0; i < P_COUNT; i++) particles.push(new GoldenParticle(cvs));
+
+        function animateBg() {
+            ctx.clearRect(0, 0, cvs.width, cvs.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        // ── 2. COUNTDOWN ──
+        function initCountdown() {
+            const nextSorteo = new Date('2026-09-06T20:00:00');
+            function update() {
+                const now = new Date().getTime();
+                const diff = nextSorteo.getTime() - now;
+                if (diff < 0) return;
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById('days').innerText = d.toString().padStart(2, '0');
+                document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+                document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+                document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+            }
+            setInterval(update, 1000);
+            update();
+        }
+        initCountdown();
+
+        // ── 2.5 ELEMENT SELECTORS ──
+        const ticketGrid = document.getElementById('ticketGrid');
+        const selectionStatus = document.getElementById('selectionStatus');
+        const hiddenNumeros = document.getElementById('f_numeros');
+        const prizeSelect = document.getElementById('prizeSelect');
+        const inputCant = document.getElementById('f_cantidad');
+        const inputMonto = document.getElementById('f_monto');
+        const pImg = document.getElementById('prizeImg');
+        const pName = document.getElementById('prizeName');
+        const pDesc = document.getElementById('prizeDesc');
+        const form = document.getElementById('purchaseForm');
+
+        let selectedNumbers = new Set();
+        
+        // Simular algunos números vendidos (ej. 15%) de forma aleatoria
+        const soldNumbers = new Set();
+        while(soldNumbers.size < 150) {
+            soldNumbers.add(Math.floor(Math.random() * (1500 - 500 + 1)) + 500);
+        }
+
+        function initTickets() {
+            const fragment = document.createDocumentFragment();
+            for (let i = 500; i <= 1500; i++) {
+                const item = document.createElement('div');
+                item.className = 'ticket-item';
+                if (soldNumbers.has(i)) item.classList.add('sold');
+                item.innerText = i;
+                item.dataset.number = i;
+                item.onclick = () => toggleTicket(i, item);
+                fragment.appendChild(item);
+            }
+            ticketGrid.appendChild(fragment);
+        }
+
+        function toggleTicket(num, el) {
+            if (el.classList.contains('sold')) return;
+            
+            const max = parseInt(inputCant.value) || 1;
+            
+            if (selectedNumbers.has(num)) {
+                selectedNumbers.delete(num);
+                el.classList.remove('selected');
+            } else {
+                if (selectedNumbers.size >= max) {
+                    alert(`Has alcanzado el límite de ${max} boletos. Aumenta la cantidad si deseas elegir más.`);
+                    return;
+                }
+                selectedNumbers.add(num);
+                el.classList.add('selected');
+            }
+            updateSelectionStatus();
+        }
+
+        function updateSelectionStatus() {
+            const max = parseInt(inputCant.value) || 1;
+            selectionStatus.innerHTML = `Seleccionados: <b style="font-size:1.1rem">${selectedNumbers.size}</b> / ${max}`;
+            hiddenNumeros.value = Array.from(selectedNumbers).sort((a,b) => a-b).join(', ');
+            
+            // Visual feedback
+            if (selectedNumbers.size === max) {
+                selectionStatus.style.color = '#25D366';
+                selectionStatus.style.textShadow = '0 0 10px rgba(37, 211, 102, 0.4)';
+            } else {
+                selectionStatus.style.color = 'var(--gold)';
+                selectionStatus.style.textShadow = 'none';
+            }
+        }
+
+        // Reset selection if quantity changes
+        inputCant.addEventListener('change', () => {
+            selectedNumbers.clear();
+            document.querySelectorAll('.ticket-item.selected').forEach(el => el.classList.remove('selected'));
+            updateSelectionStatus();
+        });
+
+        initTickets();
+
+        // ── 3. DYNAMIC PRICING & PRIZE UPDATE ──
+        function updatePrice() {
+            const [price, name] = prizeSelect.value.split('|');
+            const cant = parseInt(inputCant.value) || 1;
+            const total = parseInt(price) * cant;
+            inputMonto.value = `RD$ ${total.toLocaleString('es-DO')}`;
+
+            // Update preview card
+            if (name === 'GRAN RIFA VILLA ALTAGRACIA') {
+                pImg.src = 'images/RifaActual.png';
+                pName.innerText = 'GRAN RIFA VILLA ALTAGRACIA';
+                pDesc.innerText = 'Mitsubishi Fuso 2023 + Premios';
+            } else if (name === 'GRAN PREMIO VIP') {
+                pImg.src = 'images/Rifa.png';
+                pName.innerText = 'GRAN PREMIO VIP';
+                pDesc.innerText = 'Honda CR-V + Civic 2023';
+            } else {
+                pImg.src = 'images/Civic.png';
+                pName.innerText = 'HONDA CIVIC OFICIAL';
+                pDesc.innerText = 'Edición especial JTM';
+            }
+        }
+        prizeSelect.addEventListener('change', updatePrice);
+        inputCant.addEventListener('input', updatePrice);
+
+        // Parse URL params if coming from index.html
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPrize = urlParams.get('prize');
+        if (urlPrize === 'FUSO') {
+            prizeSelect.value = "300|GRAN RIFA VILLA ALTAGRACIA";
+            updatePrice();
+        } else if (urlPrize && urlPrize.includes('CIVIC')) {
+            prizeSelect.value = "300|HONDA CIVIC OFICIAL";
+            updatePrice();
+        }
+
+        // ── 4. FILE UPLOAD & PREVIEW ──
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('f_comprobante');
+        const previewCont = document.getElementById('previewContainer');
+        const previewImg = document.getElementById('previewImg');
+        const fileNameEl = document.getElementById('fileName');
+        const removeBtn = document.getElementById('removeFileBtn');
+        let selectedFile = null;
+
+        uploadZone.addEventListener('click', (e) => {
+            if (e.target !== removeBtn) fileInput.click();
+        });
+
+        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', e => {
+            e.preventDefault(); uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) handleFile(fileInput.files[0]);
+        });
+
+        function handleFile(file) {
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+            if (!validTypes.includes(file.type)) {
+                alert('Formato no válido. Solo JPG, PNG o PDF.'); return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('El archivo es muy pesado. Máximo 5MB.'); return;
+            }
+
+            selectedFile = file;
+            fileNameEl.innerText = file.name;
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = e => { previewImg.src = e.target.result; previewCont.classList.remove('hidden'); };
+                reader.readAsDataURL(file);
+            } else {
+                // PDF fallback
+                previewImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" x="20" font-size="20" fill="%23fff">PDF</text></svg>';
+                previewCont.classList.remove('hidden');
+            }
+
+            // Step validation logic
+            updateSteps();
+        }
+
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectedFile = null;
+            fileInput.value = '';
+            previewCont.classList.add('hidden');
+            previewImg.src = '';
+            updateSteps();
+        });
+
+        // ── 5. FORM VALIDATION & MASKS ──
+
+        // Simple Cedula mask (XXX-XXXXXXX-X)
+        const cedulaIn = document.getElementById('f_cedula');
+        cedulaIn.addEventListener('input', function (e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,7})(\d{0,1})/);
+            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+
+        // Simple Phone mask
+        const telIn = document.getElementById('f_telefono');
+        telIn.addEventListener('input', function (e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+
+        function validateField(el, condition) {
+            const group = el.closest('.form-group');
+            if (!condition) { group.classList.add('has-error'); return false; }
+            group.classList.remove('has-error'); return true;
+        }
+
+        function validateForm() {
+            let isValid = true;
+            isValid &= validateField(document.getElementById('f_nombre'), document.getElementById('f_nombre').value.trim().length >= 3);
+            isValid &= validateField(cedulaIn, cedulaIn.value.length >= 11);
+            isValid &= validateField(telIn, telIn.value.length >= 10);
+
+            const correo = document.getElementById('f_correo').value;
+            if (correo) isValid &= validateField(document.getElementById('f_correo'), /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo));
+
+            isValid &= validateField(fileInput, selectedFile !== null);
+
+            return !!isValid;
+        }
+
+        // Live steps update
+        form.addEventListener('input', updateSteps);
+        function updateSteps() {
+            const hasData = document.getElementById('f_nombre').value || document.getElementById('f_telefono').value;
+            const hasFile = selectedFile !== null;
+
+            const s1 = document.querySelector('.step[data-step="1"]');
+            const s2 = document.querySelector('.step[data-step="2"]');
+            const s3 = document.querySelector('.step[data-step="3"]');
+            const l1 = document.getElementById('line1');
+            const l2 = document.getElementById('line2');
+
+            if (hasData) { s1.classList.add('completed'); s2.classList.add('active'); l1.classList.add('active'); }
+            else { s1.classList.remove('completed'); s2.classList.remove('active'); l1.classList.remove('active'); }
+
+            if (hasFile) { s2.classList.add('completed'); s3.classList.add('active'); l2.classList.add('active'); }
+            else { s2.classList.remove('completed'); s3.classList.remove('active'); l2.classList.remove('active'); }
+        }
+
+        // ── 6. SUBMIT TO WHATSAPP ──
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!validateForm()) return;
+            
+            const max = parseInt(inputCant.value) || 1;
+            if (selectedNumbers.size < max) {
+                alert(`Por favor, termina de elegir tus ${max} números en la tabla.`);
+                return;
+            }
+
+            const [, pNameVal] = prizeSelect.value.split('|');
+            const cant = document.getElementById('f_cantidad').value;
+            const monto = document.getElementById('f_monto').value;
+            const numerosElegidos = document.getElementById('f_numeros').value || 'Azar';
+            const idReq = `JTM-${Math.floor(Math.random() * 1000000)}`;
+
+            const msg = `🚀 *NUEVA COMPRA DE BOLETO* 🚀\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `👤 *Nombre:* ${document.getElementById('f_nombre').value}\n` +
+                `🪪 *Cédula:* ${document.getElementById('f_cedula').value}\n` +
+                `📱 *Teléfono:* ${document.getElementById('f_telefono').value}\n` +
+                (document.getElementById('f_correo').value ? `✉️ *Correo:* ${document.getElementById('f_correo').value}\n` : '') +
+                `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `🎁 *Premio:* ${pNameVal}\n` +
+                `🎟️ *Boletos:* ${cant}\n` +
+                `🔢 *Números:* ${numerosElegidos}\n` +
+                `💰 *Monto a confirmar:* ${monto}\n` +
+                `📎 *Archivo adjunto:* ${selectedFile.name}\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `_ID: ${idReq}_`;
+
+            // Open WhatsApp
+            const wpUrl = `https://wa.me/18098280554?text=${encodeURIComponent(msg)}`;
+            window.open(wpUrl, '_blank');
+
+            // Show Success Portal
+            document.getElementById('succ_id').innerText = idReq;
+            document.getElementById('succ_premio').innerText = pNameVal;
+            document.getElementById('succ_boletos').innerText = cant;
+            document.getElementById('succ_numeros').innerText = numerosElegidos;
+            
+            const overlay = document.getElementById('successOverlay');
+            overlay.classList.add('active');
+
+            // Typing Effect Logic
+            setTimeout(() => {
+                typeWriter('portalTitle', '¡FELICIDADES POR TU COMPRA!', 50, () => {
+                    typeWriter('portalMsg', `Muchas gracias por confiar en Julio Té Monta. Tus boletos han sido registrados con éxito. Recuerda que cuantos más boletos compres, ¡mayores serán tus posibilidades de ganar ese gran premio! ¡Mucha suerte! 🍀`, 30);
+                });
+            }, 800);
+
+            // Timer Progress
+            const timerBar = document.getElementById('timerProgress');
+            setTimeout(() => {
+                timerBar.style.width = '0%';
+            }, 100);
+
+            // Auto-close after 3 minutes
+            setTimeout(() => {
+                window.location.reload();
+            }, 180000);
+        });
+
+        function typeWriter(id, text, speed, callback) {
+            let i = 0;
+            const el = document.getElementById(id);
+            el.innerHTML = '';
+            function type() {
+                if (i < text.length) {
+                    el.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else if (callback) {
+                    callback();
+                }
+            }
+            type();
+        }
+
+        // ── 7. UTILS ──
+        async function copiarCuenta(text, btn) {
+            try {
+                await navigator.clipboard.writeText(text);
+                const original = btn.innerText;
+                btn.innerText = '✓ Copiado';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.innerText = original; btn.classList.remove('copied'); }, 2000);
+            } catch (err) {
+                console.error('Error copiando', err);
+            }
+        }
+
+        function guardarLocalmente() {
+            if (!validateForm()) { alert('Completa los campos obligatorios primero.'); return; }
+            alert('Copia de seguridad guardada en tu navegador localmente.');
+        }
+
+    </script>
+</body>
+
+</html>

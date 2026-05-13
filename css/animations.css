@@ -1,0 +1,199 @@
+/* ANIMATIONS */
+
+/* Loading Screen */
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #080a0c;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s cubic-bezier(0.8, 0, 0.2, 1), visibility 0.8s;
+  overflow: hidden;
+}
+.loader-bg-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vh;
+  height: 100vh;
+  background: radial-gradient(circle, rgba(204,0,0,0.15) 0%, transparent 70%);
+  animation: pulseBg 3s infinite alternate;
+}
+@keyframes pulseBg {
+  from { opacity: 0.5; transform: translate(-50%, -50%) scale(0.8); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+.loader.hide {
+  opacity: 0;
+  visibility: hidden;
+}
+.loader-content {
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  z-index: 10;
+  padding: 0 1rem;
+}
+.loader-welcome {
+  font-family: var(--font-tech);
+  color: var(--chrome-mid);
+  letter-spacing: 4px;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeInDown 0.8s ease 0.2s forwards;
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.loader-images-container {
+  position: relative;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.loader-key-img {
+  position: absolute;
+  height: 120px;
+  width: auto;
+  z-index: 2;
+  opacity: 0;
+  transform: scale(0) rotate(-45deg);
+  animation: keyReveal 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s forwards, floatKey 3s ease-in-out 1.5s infinite alternate;
+  filter: drop-shadow(0 0 15px rgba(204,0,0,0.6));
+}
+@keyframes keyReveal {
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes floatKey {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(-10px) rotate(5deg); }
+}
+.loader-logo-img {
+  position: absolute;
+  max-width: 90%;
+  height: auto;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: logoSlideUp 1s ease 1.2s forwards;
+}
+@keyframes logoSlideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.loader-tagline {
+  font-family: var(--font-tech);
+  color: var(--chrome-light);
+  font-size: 0.9rem;
+  letter-spacing: 3px;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 1.8s forwards;
+}
+
+.loader-progress-wrapper {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  max-width: 250px;
+  margin: 0 auto 0.5rem;
+  position: relative;
+}
+.loader-progress-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+  border-radius: 4px;
+}
+.loader-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--red-dark), var(--red-bright));
+  box-shadow: 0 0 10px var(--red-main);
+  border-radius: 4px;
+}
+.loader-pct {
+  font-family: var(--font-tech);
+  font-size: 1.1rem;
+  color: var(--chrome-white);
+  font-weight: bold;
+}
+
+/* Scroll Animations */
+.animate-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.animate-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseRed {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(204,0,0,.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(204,0,0,0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+.float-anim {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Canvas Background & Overlay Styles */
+.loader-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-logo-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 640px;
+  width: 90%;
+  margin: 1.5rem 0;
+}
+
+.hero-logo-wrap img {
+  width: 100%;
+  display: block;
+}
+
+#snakeCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}

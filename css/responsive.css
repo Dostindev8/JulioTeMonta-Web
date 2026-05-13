@@ -1,0 +1,85 @@
+/* RESPONSIVE DESIGN - MOBILE FIRST APPROACH ALREADY HANDLED VIA CLAMP, NOW OVERRIDES */
+
+/* lg: 900-1199px */
+@media (max-width: 1199px) {
+  .steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .rifas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ganadores-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .testimonios-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* md: 700-899px */
+@media (max-width: 899px) {
+  .nav-links, .nav-container .btn {
+    display: none;
+  }
+  .hamburger {
+    display: flex;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem 2rem;
+  }
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ticket-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* sm: 480-699px */
+@media (max-width: 699px) {
+  .hero-actions {
+    flex-direction: column;
+  }
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+  .rifas-grid {
+    grid-template-columns: 1fr;
+  }
+  .ganadores-grid {
+    grid-template-columns: 1fr;
+  }
+  .testimonios-grid {
+    grid-template-columns: 1fr;
+  }
+  .numbers-picker {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+/* xs: 0-479px */
+@media (max-width: 479px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+  .numbers-picker {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .numbers-picker .num-btn {
+    min-width: 44px; /* Touch target */
+    height: 44px;
+  }
+  .ticket-container {
+    padding: 1.5rem 1rem;
+  }
+  .section-header h2 {
+    font-size: 2.2rem;
+  }
+  .stat-number {
+    font-size: 2.5rem;
+  }
+}
