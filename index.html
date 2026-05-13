@@ -87,13 +87,15 @@
         }
 
         .hero {
-            height: 100vh;
+            min-height: 100vh;
+            height: auto;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
-            padding-top: 80px;
+            padding-top: 100px; /* Increased to avoid navbar overlap */
+            padding-bottom: 50px;
         }
 
         .hero-logo-wrap {
@@ -791,16 +793,15 @@
     <!-- 2. HERO -->
     <section id="hero" class="hero" style="position: relative; overflow: hidden;">
         <!-- Ticket Rain Container -->
-        <div id="ticket-rain-container" style="position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0.6;"></div>
+        <div id="ticket-rain-container" style="position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0.35;"></div>
         <div class="container" style="position: relative; z-index: 1;">
-            <div class="uppercase text-gold" style="letter-spacing: 4px; margin-bottom: 1rem; font-size: 0.9rem;">Rifas
-                oficiales de confianza</div>
-            <h1 style="font-size: clamp(2.5rem, 8vw, 5rem);">GANA TU PRÓXIMO <br> <span class="text-red">VEHÍCULO</span>
+            <div class="uppercase text-gold" style="letter-spacing: 4px; margin-bottom: 0.5rem; font-size: 0.8rem; opacity: 0.8;">Rifas oficiales de confianza</div>
+            <h1 style="font-size: clamp(1.8rem, 5vw, 3.2rem); line-height: 1.1; margin-bottom: 1rem;">GANA TU PRÓXIMO <br> <span class="text-red">VEHÍCULO</span>
             </h1>
 
             <!-- Countdown Section -->
-            <div class="countdown-wrapper" style="margin: 2rem auto; max-width: 500px;">
-                <div style="font-size: 0.9rem; color: var(--gold); letter-spacing: 2px; margin-bottom: 1rem; text-transform: uppercase; font-weight: 700;">PRÓXIMO GRAN SORTEO: 6 DE SEPTIEMBRE</div>
+            <div class="countdown-wrapper" style="margin: 1rem auto; max-width: 400px;">
+                <div style="font-size: 0.75rem; color: var(--gold); letter-spacing: 2px; margin-bottom: 0.6rem; text-transform: uppercase; font-weight: 700; opacity: 0.9;">PRÓXIMO GRAN SORTEO: 6 DE SEPTIEMBRE</div>
                 <div class="countdown-grid">
                     <div class="countdown-item">
                         <span id="days">00</span>
@@ -821,7 +822,7 @@
                 </div>
             </div>
 
-            <div class="hero-logo-wrap" style="margin: 3rem auto;">
+            <div class="hero-logo-wrap" style="margin: 1rem auto; max-width: 400px;">
                 <img src="images/logo.png" alt="Julio Té Monta">
                 <canvas id="snakeCanvas"></canvas>
             </div>

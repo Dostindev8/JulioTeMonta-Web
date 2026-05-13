@@ -146,7 +146,7 @@ function createTicket(container) {
     const startX = Math.random() * 100;
     const duration = 5 + Math.random() * 10;
     const delay = Math.random() * 5;
-    const size = 20 + Math.random() * 30;
+    const size = 8 + Math.random() * 12;
     const rotation = Math.random() * 360;
     
     ticket.style.left = `${startX}%`;
