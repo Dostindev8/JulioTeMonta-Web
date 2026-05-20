@@ -7,7 +7,7 @@
 //    t=2.8s  → Logo exits → Key entrance begins
 //    t=4.2s  → Key glow loop starts
 //    t=4.8s  → "BIENVENIDOS A" label fades in
-//    t=5.4s  → Typing effect starts
+//    t=5.4s  → Typing: "Richard y Julio" / "Té Monta"
 //    t=end   → CTA button appears
 // ================================================================
 
@@ -18,8 +18,8 @@ class IntroSequence {
     this.typingText  = document.getElementById('typing-text');
     this.cursor      = document.getElementById('typing-cursor');
     this.content     = document.querySelector('.intro-content');
-    this.message     = 'Julio Té Monta';
-    this.typingSpeed = 90;
+    this.messageLines = ['Richard y Julio', 'Té Monta'];
+    this.typingSpeed  = 85;
     this.raf         = null;
     this.nodes       = [];
     this.canvas      = null;
@@ -143,13 +143,27 @@ class IntroSequence {
   //  TYPING EFFECT
   // ──────────────────────────────────────────────────────────────
   async _typeText() {
-    for (let i = 0; i <= this.message.length; i++) {
-      this.typingText.textContent = this.message.slice(0, i);
-      await this._delay(this.typingSpeed);
+    this.typingText.innerHTML = '';
+
+    for (let lineIndex = 0; lineIndex < this.messageLines.length; lineIndex++) {
+      const lineEl = document.createElement('span');
+      lineEl.className = 'typing-line';
+      if (lineIndex === 1) lineEl.classList.add('typing-line--brand');
+      this.typingText.appendChild(lineEl);
+
+      const text = this.messageLines[lineIndex];
+      for (let i = 0; i <= text.length; i++) {
+        lineEl.textContent = text.slice(0, i);
+        await this._delay(this.typingSpeed);
+      }
+
+      if (lineIndex < this.messageLines.length - 1) {
+        await this._delay(220);
+      }
     }
-    // Freeze cursor after typing
+
     if (this.cursor) {
-      this.cursor.style.opacity  = '0';
+      this.cursor.style.opacity   = '0';
       this.cursor.style.animation = 'none';
     }
   }

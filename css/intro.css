@@ -142,10 +142,13 @@
 
 .slide-logo-tagline {
   font-family: 'Poppins', sans-serif;
-  font-size: clamp(0.72rem, 2vw, 0.92rem);
+  font-size: clamp(0.65rem, 1.85vw, 0.88rem);
   color: rgba(255,255,255,0.48);
-  letter-spacing: 4px;
+  letter-spacing: clamp(2px, 0.5vw, 4px);
   text-transform: uppercase;
+  max-width: min(92vw, 520px);
+  line-height: 1.55;
+  text-wrap: balance;
 }
 
 /* ================================================================
@@ -242,16 +245,44 @@
   }
 }
 
-/* ── TYPING TEXT ─────────────────────────────────────────── */
+/* ── TYPING TITLE (Richard y Julio · Té Monta) ───────────── */
+.intro-title-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  max-width: min(94vw, 720px);
+  margin: 0 auto 4px;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
 #typing-text {
   font-family: 'Cinzel', serif;
   color: #fff;
-  font-size: clamp(1.9rem, 5.5vw, 3.4rem);
+  font-size: clamp(1.65rem, 5vw, 3.2rem);
   font-weight: 800;
   text-shadow: 0 0 20px rgba(255,215,0,.45), 0 2px 12px rgba(0,0,0,.9);
-  margin: 0 0 4px;
-  min-height: 1.3em;
-  letter-spacing: 2px;
+  margin: 0;
+  min-height: 2.5em;
+  letter-spacing: clamp(1px, 0.35vw, 2px);
+  line-height: 1.15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.08em;
+}
+
+#typing-text .typing-line {
+  display: block;
+  white-space: nowrap;
+}
+
+#typing-text .typing-line--brand {
+  color: var(--gold);
+  text-shadow: 0 0 24px rgba(255,215,0,.55), 0 2px 12px rgba(0,0,0,.9);
 }
 
 #typing-cursor {
@@ -310,7 +341,14 @@
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 480px) {
-  #intro-key { width: clamp(180px, 52vw, 280px); }
-  #typing-text { font-size: clamp(1.5rem, 7.5vw, 2.4rem); }
+  #intro-key { width: clamp(180px, 52vw, 280px); margin-bottom: 20px; }
+  #typing-text { font-size: clamp(1.35rem, 6.8vw, 2.1rem); min-height: 2.35em; }
+  #typing-text .typing-line { white-space: normal; text-wrap: balance; }
+  .intro-title-wrap { max-width: 96vw; }
   .slide-logo-wrap img { width: min(78vw, 320px); }
+  .intro-label { letter-spacing: 4px; margin-bottom: 10px; }
+}
+
+@media (max-width: 360px) {
+  #typing-text { font-size: clamp(1.2rem, 6.2vw, 1.85rem); letter-spacing: 0.5px; }
 }
