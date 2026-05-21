@@ -276,7 +276,11 @@ window.addEventListener('load', () => {
     
     const snakeCanvas = document.getElementById('snakeCanvas');
     if (snakeCanvas) {
-        const snake = new SnakeLogo(snakeCanvas);
-        window.addEventListener('mousemove', (e) => snake.updateMouse(e));
+        if (window.innerWidth >= 768) {
+            const snake = new SnakeLogo(snakeCanvas);
+            window.addEventListener('mousemove', (e) => snake.updateMouse(e));
+        } else {
+            snakeCanvas.style.display = 'none';
+        }
     }
 });

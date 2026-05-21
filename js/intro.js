@@ -63,7 +63,7 @@ class IntroSequence {
     let showingRifa = true;
 
     // Crossfade every 4 seconds
-    setInterval(() => {
+    this.bgInterval = setInterval(() => {
       showingRifa = !showingRifa;
       if (showingRifa) {
         rifa.style.opacity  = '0.38';
@@ -185,7 +185,8 @@ class IntroSequence {
     this.intro.insertBefore(this.canvas, this.intro.firstChild);
     this.ctx = this.canvas.getContext('2d');
     this._resizeCanvas();
-    window.addEventListener('resize', () => this._resizeCanvas());
+    this._resizeHandler = () => this._resizeCanvas();
+    window.addEventListener('resize', this._resizeHandler);
   }
 
   _resizeCanvas() {
@@ -196,9 +197,12 @@ class IntroSequence {
   }
 
   _initNodes() {
-    const count = Math.min(60, Math.floor(
+    const isMobile = window.innerWidth < 768;
+    const baseCount = Math.min(60, Math.floor(
       (window.innerWidth * window.innerHeight) / 13000
     ));
+    // Limit to max 12 nodes on mobile to protect Safari from running out of thread resources
+    const count = isMobile ? Math.min(12, baseCount) : baseCount;
     this.nodes = Array.from({ length: count }, () => ({
       x:    Math.random() * this.canvas.width,
       y:    Math.random() * this.canvas.height,
@@ -291,19 +295,51 @@ class IntroSequence {
   _delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  // ── STOP AND CLEAN RESOURCES (Anti-Crash) ──
+  stop() {
+    if (this.raf) {
+      cancelAnimationFrame(this.raf);
+      this.raf = null;
+    }
+    if (this.bgInterval) {
+      clearInterval(this.bgInterval);
+      this.bgInterval = null;
+    }
+    if (this._resizeHandler) {
+      window.removeEventListener('resize', this._resizeHandler);
+      this._resizeHandler = null;
+    }
+    if (this.canvas) {
+      this.canvas.remove();
+      this.canvas = null;
+      this.ctx = null;
+    }
+  }
 }
+
+// Global reference for stopping on transition
+window.introSequenceInstance = null;
 
 // ── BOOT ────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  new IntroSequence().init();
+  window.introSequenceInstance = new IntroSequence();
+  window.introSequenceInstance.init();
 });
 
 // ── ENTER SITE ──────────────────────────────────────────────────
 function enterSite() {
+  if (window.introSequenceInstance) {
+    window.introSequenceInstance.stop();
+  }
   const intro = document.getElementById('intro');
-  intro.classList.add('hide');
-  setTimeout(() => {
-    intro.style.display          = 'none';
-    document.body.style.overflow = 'auto';
-  }, 1000);
+  if (intro) {
+    intro.classList.add('hide');
+    setTimeout(() => {
+      intro.style.display          = 'none';
+      document.body.style.overflow = 'auto';
+      // Release entire DOM branch and sub-resources
+      intro.remove();
+    }, 1000);
+  }
 }
