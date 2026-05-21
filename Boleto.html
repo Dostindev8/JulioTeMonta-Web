@@ -14,6 +14,9 @@
         href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;600&family=Poppins:wght@400;600;700&display=swap"
         rel="stylesheet">
 
+    <!-- html2canvas Library for Automatic Screenshot Downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         :root {
             --gold: #ff3c3c; /* Reddish base */
@@ -328,6 +331,8 @@
             cursor: pointer;
             transition: 0.2s;
             color: #888;
+            content-visibility: auto;
+            contain-intrinsic-size: 50px;
         }
 
         .ticket-item:hover:not(.sold) {
@@ -1006,6 +1011,423 @@
         .hidden {
             display: none !important;
         }
+
+        /* --- NEW PREMIUM ADDITIONS FOR TICKET SELECTOR & DIGITAL TICKET --- */
+        .selector-mode-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+            gap: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: #000;
+            background: var(--red-gold-gradient);
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.25);
+        }
+
+        .selector-panel {
+            display: none;
+            animation: fadeInPanel 0.4s ease;
+        }
+
+        .selector-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeInPanel {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .search-box-container {
+            flex: 1;
+            max-width: 250px;
+            margin: 0 15px;
+        }
+
+        @media (max-width: 768px) {
+            .ticket-grid-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .search-box-container {
+                max-width: 100%;
+                margin: 0;
+            }
+        }
+
+        .search-input {
+            padding: 8px 12px 8px 35px !important;
+            font-size: 0.85rem !important;
+            height: 36px;
+        }
+
+        /* Auto selection panel styles */
+        .auto-selector-wrap {
+            padding: 30px 20px;
+            text-align: center;
+            background: rgba(255, 215, 0, 0.02);
+            border: 1px dashed rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .auto-info-text {
+            color: #bbb;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-auto-action {
+            background: var(--red-gold-gradient);
+            border: none;
+            color: #000;
+            padding: 14px 28px;
+            font-family: var(--font-body);
+            font-weight: 800;
+            font-size: 0.95rem;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 60, 60, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-auto-action:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(255, 204, 0, 0.45);
+        }
+
+        .btn-auto-action:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-auto-action .sparkle {
+            animation: bounceSparkle 1.2s ease infinite;
+        }
+
+        @keyframes bounceSparkle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3) rotate(15deg); }
+        }
+
+        .auto-numbers-display {
+            margin-top: 25px;
+            min-height: 70px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .placeholder-text {
+            color: #555;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .auto-chip {
+            background: var(--red-gold-gradient);
+            color: #000;
+            font-weight: 800;
+            font-size: 1.1rem;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px var(--gold-glow);
+            animation: popChip 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            font-family: var(--font-body);
+        }
+
+        @keyframes popChip {
+            from { transform: scale(0.3) rotate(-30deg); opacity: 0; }
+            to { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        /* FOTORREALISTA DIGITAL TICKET STYLING */
+        .digital-ticket-container {
+            margin: 25px auto;
+            width: 100%;
+            max-width: 460px;
+            perspective: 1000px;
+        }
+
+        .digital-ticket {
+            background: linear-gradient(135deg, rgba(19, 19, 36, 0.93) 0%, rgba(8, 8, 17, 0.97) 100%),
+                        url('images/Juliotemonta.png') center/cover no-repeat;
+            border: 3px solid #ffcc00;
+            border-radius: 20px;
+            padding: 24px;
+            text-align: left;
+            position: relative;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 
+                        0 0 30px rgba(255, 204, 0, 0.15),
+                        inset 0 0 20px rgba(255, 255, 255, 0.02);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            font-family: var(--font-body);
+        }
+
+        /* Glassmorphism card shines */
+        .digital-ticket::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 45%, rgba(255, 255, 255, 0.08) 50%, transparent 55%);
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+        /* Ticket header */
+        .ticket-header-brand {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed rgba(255, 215, 0, 0.2);
+            padding-bottom: 12px;
+            margin-bottom: 5px;
+        }
+
+        .brand-logo-small {
+            height: 38px;
+            filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.4));
+        }
+
+        .ticket-badge-official {
+            background: var(--red-gold-gradient);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Ticket Info Area */
+        .ticket-prize-title {
+            text-align: center;
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            margin: 5px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .ticket-buyer-info {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 8px 12px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.8rem;
+        }
+
+        .buyer-field {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .buyer-field label {
+            color: #666;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .buyer-field span {
+            color: #eee;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Digital numbers display */
+        .ticket-numbers-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 215, 0, 0.03);
+            border: 1px solid rgba(255, 204, 0, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .ticket-numbers-section label {
+            font-size: 0.7rem;
+            color: var(--gold-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .ticket-numbers-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ticket-num-gold {
+            background: radial-gradient(circle, #ffcc00 0%, #cc9900 100%);
+            color: #000;
+            font-size: 1.15rem;
+            font-weight: 900;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(255, 204, 0, 0.4),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                        inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+            border: 1px solid #ffdb4d;
+        }
+
+        /* Barcode / Footer */
+        .ticket-barcode-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .ticket-barcode {
+            font-family: 'Libre Barcode 39', monospace, sans-serif;
+            font-size: 2.2rem;
+            color: #ccc;
+            letter-spacing: 1px;
+            line-height: 1;
+            opacity: 0.8;
+            user-select: none;
+            /* Simple custom barcode lines */
+            height: 35px;
+            width: 140px;
+            background: repeating-linear-gradient(90deg, 
+                #eee, #eee 2px, 
+                transparent 2px, transparent 5px, 
+                #eee 5px, #eee 8px,
+                transparent 8px, transparent 9px,
+                #eee 9px, #eee 10px);
+        }
+
+        .ticket-serial {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .ticket-serial b {
+            color: var(--gold-glow);
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Success seal */
+        .success-seal {
+            position: absolute;
+            bottom: 45px;
+            right: 20px;
+            transform: rotate(-12deg);
+            border: 2px solid #25D366;
+            color: #25D366;
+            font-weight: 900;
+            font-size: 0.65rem;
+            padding: 4px 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            background: rgba(37, 211, 102, 0.05);
+            box-shadow: 0 0 10px rgba(37, 211, 102, 0.1);
+            pointer-events: none;
+        }
+
+        /* Download button styling */
+        .btn-download-ticket {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .btn-download-ticket:hover {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.5);
+        }
+
+        .btn-download-ticket:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 
@@ -1168,31 +1590,60 @@
                         </div>
 
                         <div class="form-group full">
-                            <label class="form-label">Elige tus números (500 - 1500)</label>
+                            <label class="form-label">Estructura de Boletos (Elige tu Modalidad)</label>
+                            
+                            <!-- Selector Mode Tabs -->
+                            <div class="selector-mode-tabs">
+                                <button type="button" class="tab-btn active" id="btnTabManual" onclick="switchSelectorMode('manual')">🎟️ Selección Manual</button>
+                                <button type="button" class="tab-btn" id="btnTabAuto" onclick="switchSelectorMode('auto')">⚡ Selección Automática</button>
+                            </div>
+
                             <div class="ticket-selector-container">
-                                <div class="ticket-grid-header">
-                                    <div id="selectionStatus" style="font-size: 0.85rem; color: var(--gold);">Seleccionados: 0 / 1</div>
-                                    <div class="ticket-legend">
-                                        <div class="legend-item"><span class="dot available"></span> Libre</div>
-                                        <div class="legend-item"><span class="dot selected"></span> Tu Selección</div>
-                                        <div class="legend-item"><span class="dot sold"></span> No Disponible</div>
+                                <!-- Manual Panel -->
+                                <div id="panelManual" class="selector-panel active">
+                                    <div class="ticket-grid-header">
+                                        <div id="selectionStatus" style="font-size: 0.85rem; color: var(--gold);">Seleccionados: 0 / 1</div>
+                                        <div class="search-box-container">
+                                            <input type="text" id="ticketSearch" class="form-input search-input" placeholder="🔍 Buscar número (40001-45000)..." oninput="searchTicket()">
+                                        </div>
+                                        <div class="ticket-legend">
+                                            <div class="legend-item"><span class="dot available"></span> Libre</div>
+                                            <div class="legend-item"><span class="dot selected"></span> Selección</div>
+                                            <div class="legend-item"><span class="dot sold"></span> No Disp.</div>
+                                        </div>
+                                    </div>
+                                    <div class="ticket-grid" id="ticketGrid">
+                                        <!-- JS will populate -->
                                     </div>
                                 </div>
-                                <div class="ticket-grid" id="ticketGrid">
-                                    <!-- JS will populate -->
+
+                                <!-- Automatic Panel -->
+                                <div id="panelAuto" class="selector-panel">
+                                    <div class="auto-selector-wrap">
+                                        <p class="auto-info-text">El sistema seleccionará números libres aleatoriamente para ti en un instante.</p>
+                                        <div class="auto-controls">
+                                            <button type="button" class="btn-auto-action" onclick="generateRandomTickets()">
+                                                <span class="sparkle">⚡</span> GENERAR BOLETOS DE LA SUERTE
+                                            </button>
+                                        </div>
+                                        <div class="auto-numbers-display" id="autoNumbersDisplay">
+                                            <span class="placeholder-text">Ningún número generado aún</span>
+                                        </div>
+                                    </div>
                                 </div>
+                                
                                 <input type="hidden" id="f_numeros" required>
                             </div>
-                            <span class="help-text">Haz clic en los números que deseas comprar.</span>
-                            <span class="error-msg">Debes seleccionar la cantidad correcta de números</span>
+                            <span class="help-text" id="selectorHelpText">Elige la modalidad que prefieras o haz clic directamente en los números.</span>
+                            <span class="error-msg" id="selectorErrorMsg">Debes seleccionar la cantidad correcta de boletos</span>
                         </div>
 
                         <div class="form-group full">
                             <label class="form-label text-gold">Monto a Depositar</label>
                             <div class="input-wrapper">
                                 <span class="input-icon" style="color:var(--gold)">💰</span>
-                                <input type="text" id="f_monto" class="form-input highlight" style="font-size:1.2rem;"
-                                    readonly value="RD$ 500">
+                                 <input type="text" id="f_monto" class="form-input highlight" style="font-size:1.2rem;"
+                                     readonly value="RD$ 300">
                             </div>
                         </div>
 
@@ -1281,7 +1732,7 @@
 
     <!-- Success Portal Overlay -->
     <div class="success-overlay" id="successOverlay">
-        <div class="success-portal-card">
+        <div class="success-portal-card" style="max-width: 520px;">
             <button class="btn-close-portal" onclick="window.location.reload()">✕</button>
             <img src="images/logo.png" alt="Logo" class="portal-logo">
             
@@ -1295,32 +1746,72 @@
                 <p id="portalMsg"></p>
             </div>
 
-            <div class="ticket-info-box">
-                <div class="info-item">
-                    <label>ID de Registro</label>
-                    <span id="succ_id"></span>
-                </div>
-                <div class="info-item">
-                    <label>Premio</label>
-                    <span id="succ_premio"></span>
-                </div>
-                <div class="info-item">
-                    <label>Boletos</label>
-                    <span id="succ_boletos"></span>
-                </div>
-                <div class="info-item">
-                    <label>Números</label>
-                    <span id="succ_numeros" style="font-size: 0.85rem; color: var(--gold);"></span>
+            <!-- FOTORREALISTA DIGITAL TICKET -->
+            <div class="digital-ticket-container">
+                <div class="digital-ticket" id="renderDigitalTicket">
+                    <!-- Brand -->
+                    <div class="ticket-header-brand">
+                        <img src="images/logo.png" alt="Julio Té Monta Logo" class="brand-logo-small">
+                        <span class="ticket-badge-official">Boleto Reservado</span>
+                    </div>
+
+                    <!-- Urgency/Badge -->
+                    <h3 class="ticket-prize-title" id="dt_premio">GRAN RIFA VILLA ALTAGRACIA</h3>
+
+                    <!-- Buyer info -->
+                    <div class="ticket-buyer-info">
+                        <div class="buyer-field">
+                            <label>Participante</label>
+                            <span id="dt_nombre">Juan Carlos Pérez</span>
+                        </div>
+                        <div class="buyer-field">
+                            <label>Teléfono</label>
+                            <span id="dt_telefono">(809) 000-0000</span>
+                        </div>
+                        <div class="buyer-field">
+                            <label>Cédula/ID</label>
+                            <span id="dt_cedula">000-0000000-0</span>
+                        </div>
+                        <div class="buyer-field">
+                            <label>Fecha de Emisión</label>
+                            <span id="dt_fecha">21-May-2026</span>
+                        </div>
+                    </div>
+
+                    <!-- Numbers Display -->
+                    <div class="ticket-numbers-section">
+                        <label>Números de la Suerte</label>
+                        <div class="ticket-numbers-grid" id="dt_numbers_grid">
+                            <!-- Golden balls generated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Barcode and Footer -->
+                    <div class="ticket-barcode-wrap">
+                        <div class="ticket-barcode"></div>
+                        <div class="ticket-serial">
+                            <span>REGISTRO</span>
+                            <b id="dt_id">JTM-123456</b>
+                        </div>
+                    </div>
+
+                    <!-- Seal -->
+                    <div class="success-seal">Verificado</div>
                 </div>
             </div>
 
-            <div class="timer-bar">
+            <!-- Download Button -->
+            <button class="btn btn-download-ticket" type="button" onclick="downloadTicketImage()">
+                <span>📸</span> DESCARGAR COMPROBANTE (IMAGEN)
+            </button>
+
+            <div class="timer-bar" style="margin-top: 20px;">
                 <div class="timer-progress" id="timerProgress"></div>
             </div>
 
             <p style="font-size: 0.8rem; color: #777;">Esta ventana se cerrará automáticamente en 3 minutos.</p>
             
-            <button class="btn btn-whatsapp" style="margin-top: 20px;" onclick="window.location.reload()">
+            <button class="btn btn-whatsapp" style="margin-top: 15px;" onclick="window.location.reload()">
                 REALIZAR NUEVA COMPRA
             </button>
         </div>
@@ -1423,21 +1914,53 @@
         const form = document.getElementById('purchaseForm');
 
         let selectedNumbers = new Set();
+        let activeSelectorMode = 'manual'; // 'manual' or 'auto'
+        let currentTicketId = '';
+
+        // ── 2.6 LOCAL STORAGE PERSISTENCE FOR DEACTIVATING SOLD/BOUGHT TICKETS ──
+        // 1. Simulate sold numbers persistently so they don't randomize on every page load
+        let simulatedSold = JSON.parse(localStorage.getItem('jtm_simulated_sold'));
         
-        // Simular algunos números vendidos (ej. 15%) de forma aleatoria
-        const soldNumbers = new Set();
-        while(soldNumbers.size < 150) {
-            soldNumbers.add(Math.floor(Math.random() * (1500 - 500 + 1)) + 500);
+        // Data Migration: Clean up old range data (500-1500) if found
+        if (simulatedSold && (simulatedSold.length === 0 || simulatedSold[0] < 40001 || simulatedSold[0] > 45000)) {
+            simulatedSold = null;
+            localStorage.removeItem('jtm_simulated_sold');
         }
 
+        if (!simulatedSold) {
+            simulatedSold = [];
+            const soldSet = new Set();
+            while (soldSet.size < 750) {
+                soldSet.add(Math.floor(Math.random() * (45000 - 40001 + 1)) + 40001);
+            }
+            simulatedSold = Array.from(soldSet);
+            localStorage.setItem('jtm_simulated_sold', JSON.stringify(simulatedSold));
+        }
+
+        // 2. Load locally bought tickets (deactivated permanently for this user)
+        let locallyBought = JSON.parse(localStorage.getItem('jtm_locally_bought')) || [];
+        
+        // Data Migration: Filter out old range data (500-1500)
+        locallyBought = locallyBought.filter(num => num >= 40001 && num <= 45000);
+        localStorage.setItem('jtm_locally_bought', JSON.stringify(locallyBought));
+
+        // Combine simulated sold numbers + locally purchased numbers into a Set
+        const soldNumbers = new Set([...simulatedSold, ...locallyBought]);
+
         function initTickets() {
+            ticketGrid.innerHTML = '';
             const fragment = document.createDocumentFragment();
-            for (let i = 500; i <= 1500; i++) {
+            for (let i = 40001; i <= 45000; i++) {
                 const item = document.createElement('div');
                 item.className = 'ticket-item';
-                if (soldNumbers.has(i)) item.classList.add('sold');
-                item.innerText = i;
                 item.dataset.number = i;
+                
+                if (soldNumbers.has(i)) {
+                    item.classList.add('sold');
+                    item.title = 'No Disponible';
+                }
+                
+                item.innerText = i;
                 item.onclick = () => toggleTicket(i, item);
                 fragment.appendChild(item);
             }
@@ -1480,12 +2003,144 @@
 
         // Reset selection if quantity changes
         inputCant.addEventListener('change', () => {
+            clearCurrentSelection();
+        });
+
+        function clearCurrentSelection() {
             selectedNumbers.clear();
             document.querySelectorAll('.ticket-item.selected').forEach(el => el.classList.remove('selected'));
             updateSelectionStatus();
-        });
+            document.getElementById('autoNumbersDisplay').innerHTML = '<span class="placeholder-text">Ningún número generado aún</span>';
+        }
 
         initTickets();
+
+        // ── 2.7 MODE TAB SWITCHING & REAL SEARCHING ──
+        function switchSelectorMode(mode) {
+            activeSelectorMode = mode;
+            
+            // Clear current choices to prevent mixing manual & automatic selections unexpectedly
+            clearCurrentSelection();
+
+            // Toggle active tabs
+            const btnManual = document.getElementById('btnTabManual');
+            const btnAuto = document.getElementById('btnTabAuto');
+            const pManual = document.getElementById('panelManual');
+            const pAuto = document.getElementById('panelAuto');
+            const helpText = document.getElementById('selectorHelpText');
+
+            if (mode === 'manual') {
+                btnManual.classList.add('active');
+                btnAuto.classList.remove('active');
+                pManual.classList.add('active');
+                pAuto.classList.remove('active');
+                helpText.innerText = 'Escribe un número para buscarlo o haz clic directamente en la tabla.';
+            } else {
+                btnManual.classList.remove('active');
+                btnAuto.classList.add('active');
+                pManual.classList.remove('active');
+                pAuto.classList.add('active');
+                helpText.innerText = 'Presiona el botón para generar tus números de la suerte aleatoriamente.';
+            }
+        }
+
+        // Real Search Logic with smooth scrolling and high-fidelity focus glow
+        function searchTicket() {
+            const queryVal = parseInt(document.getElementById('ticketSearch').value);
+            if (isNaN(queryVal) || queryVal < 40001 || queryVal > 45000) return;
+
+            const targetItem = document.querySelector(`.ticket-item[data-number="${queryVal}"]`);
+            if (targetItem) {
+                // Smooth scroll to container view
+                targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Add extreme glow/highlight
+                targetItem.style.borderColor = '#ffcc00';
+                targetItem.style.boxShadow = '0 0 20px #ffcc00';
+                targetItem.style.transform = 'scale(1.25)';
+                targetItem.style.zIndex = '10';
+
+                setTimeout(() => {
+                    targetItem.style.borderColor = '';
+                    targetItem.style.boxShadow = '';
+                    targetItem.style.transform = '';
+                    targetItem.style.zIndex = '';
+                }, 2000);
+            }
+        }
+
+        // ── 2.8 AUTOMATIC GENERATION & HIGH-FIDELITY ANIMATION ──
+        function generateRandomTickets() {
+            const max = parseInt(inputCant.value) || 1;
+            
+            // Get all available numbers
+            const available = [];
+            for (let i = 40001; i <= 45000; i++) {
+                if (!soldNumbers.has(i)) {
+                    available.push(i);
+                }
+            }
+
+            if (available.length < max) {
+                alert('No hay suficientes boletos disponibles para realizar la asignación automática.');
+                return;
+            }
+
+            const autoDisplay = document.getElementById('autoNumbersDisplay');
+            autoDisplay.innerHTML = '';
+            
+            // Generate distinct random tickets
+            const picked = [];
+            const tempAvailable = [...available];
+            for (let i = 0; i < max; i++) {
+                const randIndex = Math.floor(Math.random() * tempAvailable.length);
+                picked.push(tempAvailable.splice(randIndex, 1)[0]);
+            }
+
+            // High fidelity rolling slot-machine animation
+            let cycleCount = 0;
+            const cycleInterval = setInterval(() => {
+                autoDisplay.innerHTML = '';
+                for (let k = 0; k < max; k++) {
+                    const fakeNum = Math.floor(Math.random() * (45000 - 40001 + 1)) + 40001;
+                    const chip = document.createElement('span');
+                    chip.className = 'auto-chip';
+                    chip.style.opacity = '0.7';
+                    chip.style.boxShadow = '0 0 10px rgba(255, 60, 60, 0.4)';
+                    chip.innerText = fakeNum;
+                    autoDisplay.appendChild(chip);
+                }
+                cycleCount++;
+                if (cycleCount >= 8) {
+                    clearInterval(cycleInterval);
+                    finalizeAutoSelection(picked);
+                }
+            }, 75);
+        }
+
+        function finalizeAutoSelection(picked) {
+            const autoDisplay = document.getElementById('autoNumbersDisplay');
+            autoDisplay.innerHTML = '';
+
+            selectedNumbers.clear();
+            document.querySelectorAll('.ticket-item.selected').forEach(el => el.classList.remove('selected'));
+
+            picked.sort((a, b) => a - b).forEach((num) => {
+                selectedNumbers.add(num);
+                
+                // Highlight inside manual grid
+                const gridItem = document.querySelector(`.ticket-item[data-number="${num}"]`);
+                if (gridItem) gridItem.classList.add('selected');
+
+                // Render beautiful golden chips
+                const chip = document.createElement('span');
+                chip.className = 'auto-chip';
+                chip.innerText = num;
+                autoDisplay.appendChild(chip);
+            });
+
+            updateSelectionStatus();
+        }
 
         // ── 3. DYNAMIC PRICING & PRIZE UPDATE ──
         function updatePrice() {
@@ -1607,8 +2262,8 @@
         function validateForm() {
             let isValid = true;
             isValid &= validateField(document.getElementById('f_nombre'), document.getElementById('f_nombre').value.trim().length >= 3);
-            isValid &= validateField(cedulaIn, cedulaIn.value.length >= 11);
-            isValid &= validateField(telIn, telIn.value.length >= 10);
+            isValid &= validateField(cedulaIn, cedulaIn.value.replace(/\D/g, '').length === 11);
+            isValid &= validateField(telIn, telIn.value.replace(/\D/g, '').length === 10);
 
             const correo = document.getElementById('f_correo').value;
             if (correo) isValid &= validateField(document.getElementById('f_correo'), /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo));
@@ -1637,14 +2292,14 @@
             else { s2.classList.remove('completed'); s3.classList.remove('active'); l2.classList.remove('active'); }
         }
 
-        // ── 6. SUBMIT TO WHATSAPP ──
+        // ── 6. SUBMIT TO WHATSAPP & DIGITAL TICKET DISPLAY ──
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             if (!validateForm()) return;
             
             const max = parseInt(inputCant.value) || 1;
             if (selectedNumbers.size < max) {
-                alert(`Por favor, termina de elegir tus ${max} números en la tabla.`);
+                alert(`Por favor, termina de elegir tus ${max} números.`);
                 return;
             }
 
@@ -1652,7 +2307,17 @@
             const cant = document.getElementById('f_cantidad').value;
             const monto = document.getElementById('f_monto').value;
             const numerosElegidos = document.getElementById('f_numeros').value || 'Azar';
-            const idReq = `JTM-${Math.floor(Math.random() * 1000000)}`;
+            
+            // Unique Registration ID
+            currentTicketId = `JTM-${Math.floor(Math.random() * 1000000)}`;
+
+            // PERSIST purchased tickets locally, which instantly deactivates them!
+            const newlyBought = Array.from(selectedNumbers);
+            locallyBought = [...locallyBought, ...newlyBought];
+            localStorage.setItem('jtm_locally_bought', JSON.stringify(locallyBought));
+
+            // Immediately mark as sold/deactivated in global pool
+            newlyBought.forEach(num => soldNumbers.add(num));
 
             const msg = `🚀 *NUEVA COMPRA DE BOLETO* 🚀\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━\n` +
@@ -1664,28 +2329,53 @@
                 `🎁 *Premio:* ${pNameVal}\n` +
                 `🎟️ *Boletos:* ${cant}\n` +
                 `🔢 *Números:* ${numerosElegidos}\n` +
-                `💰 *Monto a confirmar:* ${monto}\n` +
-                `📎 *Archivo adjunto:* ${selectedFile.name}\n` +
+                `💰 *Monto Depositado:* ${monto} (RD$ 300 c/u)\n` +
+                `📄 *Comprobante Adjunto:* ${selectedFile.name}\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `_ID: ${idReq}_`;
+                `📸 *Boleto Digital:* Adjunto a esta conversación (Imagen guardada en descargas)\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `_ID de Registro: ${currentTicketId}_`;
 
-            // Open WhatsApp
+            // Open WhatsApp with prefilled message
             const wpUrl = `https://wa.me/18098280554?text=${encodeURIComponent(msg)}`;
             window.open(wpUrl, '_blank');
 
-            // Show Success Portal
-            document.getElementById('succ_id').innerText = idReq;
-            document.getElementById('succ_premio').innerText = pNameVal;
-            document.getElementById('succ_boletos').innerText = cant;
-            document.getElementById('succ_numeros').innerText = numerosElegidos;
+            // --- POPULATE FOTORREALISTA DIGITAL TICKET ---
+            document.getElementById('dt_id').innerText = currentTicketId;
+            document.getElementById('dt_premio').innerText = pNameVal;
+            document.getElementById('dt_nombre').innerText = document.getElementById('f_nombre').value;
+            document.getElementById('dt_telefono').innerText = document.getElementById('f_telefono').value;
+            document.getElementById('dt_cedula').innerText = document.getElementById('f_cedula').value;
             
+            // Format current date nicely
+            const today = new Date();
+            const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const formattedDate = `${today.getDate().toString().padStart(2, '0')}-${months[today.getMonth()]}-${today.getFullYear()}`;
+            document.getElementById('dt_fecha').innerText = formattedDate;
+
+            // Generate Golden Ball Chips
+            const ballsContainer = document.getElementById('dt_numbers_grid');
+            ballsContainer.innerHTML = '';
+            newlyBought.sort((a,b) => a-b).forEach(num => {
+                const ball = document.createElement('span');
+                ball.className = 'ticket-num-gold';
+                ball.innerText = num;
+                ballsContainer.appendChild(ball);
+            });
+            
+            // Open Success Overlay
             const overlay = document.getElementById('successOverlay');
             overlay.classList.add('active');
 
-            // Typing Effect Logic
+            // Auto-download ticket screenshot automatically after rendering settles
             setTimeout(() => {
-                typeWriter('portalTitle', '¡FELICIDADES POR TU COMPRA!', 50, () => {
-                    typeWriter('portalMsg', `Muchas gracias por confiar en Julio Té Monta. Tus boletos han sido registrados con éxito. Recuerda que cuantos más boletos compres, ¡mayores serán tus posibilidades de ganar ese gran premio! ¡Mucha suerte! 🍀`, 30);
+                downloadTicketImage();
+            }, 1200);
+
+            // Typing Effect Logic for Luxury Header
+            setTimeout(() => {
+                typeWriter('portalTitle', '¡BOLETO GENERADO CON ÉXITO!', 40, () => {
+                    typeWriter('portalMsg', `¡Muchas gracias por participar con Julio Té Monta! Tu boleto digital ha sido emitido e inhabilitado de la tabla general. Descarga tu comprobante de imagen a continuación para tus registros personales. ¡Mucha suerte! 🍀`, 20);
                 });
             }, 800);
 
@@ -1717,6 +2407,49 @@
             type();
         }
 
+        // ── 6.5 HIGH-FIDELITY SCREENSHOT GENERATION & DOWNLOAD ──
+        function downloadTicketImage() {
+            const ticketElement = document.getElementById('renderDigitalTicket');
+            const downloadBtn = document.querySelector('.btn-download-ticket');
+            
+            // Visual feedback
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<span>⏳</span> GENERANDO COMPROBANTE...';
+            downloadBtn.disabled = true;
+
+            // Use html2canvas with scale 3 for maximum crisp/retina definition
+            html2canvas(ticketElement, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: null,
+                logging: false,
+                allowTaint: true
+            }).then(canvas => {
+                // Convert canvas to base64 data URL
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Trigger standard anchor download
+                const link = document.createElement('a');
+                link.download = `Boleto_JulioTeMonta_${currentTicketId}.png`;
+                link.href = imgData;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Restore button state
+                downloadBtn.innerHTML = '<span>✓</span> ¡DESCARGADO CON ÉXITO!';
+                setTimeout(() => {
+                    downloadBtn.innerHTML = originalText;
+                    downloadBtn.disabled = false;
+                }, 3000);
+            }).catch(err => {
+                console.error('Error generating image:', err);
+                alert('No se pudo generar la imagen automáticamente. Puedes realizar una captura de pantalla manual.');
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            });
+        }
+
         // ── 7. UTILS ──
         async function copiarCuenta(text, btn) {
             try {
@@ -1734,7 +2467,6 @@
             if (!validateForm()) { alert('Completa los campos obligatorios primero.'); return; }
             alert('Copia de seguridad guardada en tu navegador localmente.');
         }
-
     </script>
 </body>
 

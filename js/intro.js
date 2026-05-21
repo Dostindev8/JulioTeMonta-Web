@@ -7,7 +7,7 @@
 //    t=2.8s  → Logo exits → Key entrance begins
 //    t=4.2s  → Key glow loop starts
 //    t=4.8s  → "BIENVENIDOS A" label fades in
-//    t=5.4s  → Typing: "Richard y Julio" / "Té Monta"
+//    t=5.4s  → Typing: "Julio Té Monta"
 //    t=end   → CTA button appears
 // ================================================================
 
@@ -18,7 +18,7 @@ class IntroSequence {
     this.typingText  = document.getElementById('typing-text');
     this.cursor      = document.getElementById('typing-cursor');
     this.content     = document.querySelector('.intro-content');
-    this.messageLines = ['Richard y Julio', 'Té Monta'];
+    this.messageLines = ['Julio Té Monta'];
     this.typingSpeed  = 85;
     this.raf         = null;
     this.nodes       = [];

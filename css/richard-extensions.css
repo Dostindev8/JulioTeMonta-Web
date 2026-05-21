@@ -1,0 +1,119 @@
+/* richard-extensions.css — ADD only: dual logos, navbar Richard, página Richard */
+
+/* ── Dual logos (hero + intro slide) ───────────────────────── */
+.hero-dual-logos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .hero-dual-logos {
+    flex-direction: row;
+    gap: 24px;
+  }
+}
+
+.hero-dual-logos__img {
+  height: clamp(72px, 14vw, 120px);
+  width: auto;
+  max-width: min(42vw, 220px);
+  object-fit: contain;
+  display: block;
+}
+
+.hero-dual-logos--intro .hero-dual-logos__img {
+  height: clamp(80px, 16vw, 140px);
+  max-width: min(44vw, 240px);
+}
+
+.hero-logo-wrap .hero-dual-logos {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-logo-wrap .hero-dual-logos__img {
+  width: auto;
+  max-width: min(42vw, 220px);
+  border-radius: 8px;
+}
+
+.slide-logo-wrap .hero-dual-logos {
+  margin-bottom: 4px;
+}
+
+/* ── Navbar: RICHARD TE MONTA ─────────────────────────────── */
+.nav-link-richard {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-richard-icon {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+
+.nav-link-richard:hover .nav-richard-icon {
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.45));
+}
+
+@media (max-width: 768px) {
+  .nav-link-richard {
+    width: 100%;
+    padding: 4px 0;
+  }
+
+  .nav-richard-icon {
+    height: 24px;
+  }
+}
+
+/* ── Página Richard Te Monta ──────────────────────────────── */
+.richard-page-hero {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 20px 60px;
+  background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+}
+
+.richard-page-logo {
+  height: clamp(100px, 22vw, 180px);
+  width: auto;
+  object-fit: contain;
+  margin: 0 auto 24px;
+  filter: drop-shadow(0 0 24px rgba(255, 215, 0, 0.35));
+}
+
+.richard-page-card {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 28px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  border-radius: 16px;
+}
+
+.richard-page-card p {
+  color: #aaa;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+
+.richard-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 28px;
+}

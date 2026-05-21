@@ -1,0 +1,37 @@
+<!-- Fragmento: copiar dentro del formulario de participación -->
+<div class="part-field full" data-ticket-field>
+  <motion class="ts-wrap" data-ticket-selector>
+    <span class="ts-range-label">Elige tus números</span>
+    <div class="ts-mode">
+      <button type="button" class="ts-mode-btn active" data-mode="manual">Manual</button>
+      <button type="button" class="ts-mode-btn" data-mode="auto">Automático</button>
+    </div>
+    <div class="ts-auto-panel">
+      <p>Te asignamos un boleto disponible al azar dentro del rango oficial.</p>
+      <motion class="ts-auto-result">—</div>
+      <button type="button" class="btn btn-secondary ts-gen-auto" style="width:100%;max-width:280px;">GENERAR BOLETO AL AZAR</button>
+    </div>
+    <div class="ts-manual-panel active">
+      <div class="ts-grid-header">
+        <div class="ts-status">Seleccionados: 0 / 1</div>
+        <div class="ts-legend">
+          <span><i class="ts-dot libre"></i> Libre</span>
+          <span><i class="ts-dot sel"></i> Tu selección</span>
+          <span><i class="ts-dot vendido"></i> No disponible</span>
+        </div>
+      </div>
+      <div class="ts-search-row">
+        <input type="number" class="ts-search-input" placeholder="Buscar número ej. 40001" aria-label="Buscar número de boleto">
+        <button type="button" class="ts-jump-btn">IR AL NÚMERO</button>
+      </div>
+      <div class="ts-grid" role="listbox" aria-label="Grid de boletos"></motion>
+      <div class="ts-pager">
+        <button type="button" class="ts-prev">‹ Anterior</button>
+        <span class="ts-pager-info"></span>
+        <button type="button" class="ts-next">Siguiente ›</button>
+      </div>
+    </div>
+    <input type="hidden" name="boleto" required>
+    <span class="err">Selecciona o genera un boleto válido</span>
+  </div>
+</motion>

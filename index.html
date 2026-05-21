@@ -9,7 +9,7 @@
         content="El negocio de rifas más confiable de RD, Gana vehículos 0km y premios en efectivo.">
 
     <!-- Fonts -->
-    <link rel="icon" href="img/Julio_te_monta.png" width="100" height="100" type="image/png">
+    <link rel="icon" href="/images/Juliotemonta.png" width="100" height="100" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -22,7 +22,6 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/intro.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/richard-extensions.css">
 
     <style>
         /* Extra small fixes for integration */
@@ -95,7 +94,8 @@
             justify-content: center;
             text-align: center;
             background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
-            padding-top: 100px; /* Increased to avoid navbar overlap */
+            padding-top: 100px;
+            /* Increased to avoid navbar overlap */
             padding-bottom: 50px;
         }
 
@@ -104,11 +104,23 @@
             margin: 2rem 0;
             width: 100%;
             max-width: 600px;
+            display: flex;
+            justify-content: center;
         }
 
-        .hero-logo-wrap img {
-            width: 100%;
-            border-radius: 12px;
+        .hero-logo {
+            width: min(320px, 100%);
+            max-width: 380px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .slide-logo-tagline {
+            margin-top: 1rem;
+            color: #ddd;
+            font-size: 0.98rem;
+            letter-spacing: 0.9px;
+            line-height: 1.5;
         }
 
         #snakeCanvas {
@@ -738,20 +750,17 @@
         <!-- ══ SLIDE: LOGO REVEAL ══ -->
         <div class="intro-slide" id="intro-slide-3">
             <div class="slide-logo-wrap">
-                <img src="images/logo.png" alt="Richard y Julio Té Monta Logo">
-                <div class="slide-logo-tagline">Richard y Julio · Rifas y Sorteos Oficiales · República Dominicana</div>
+                <img src="images/logo.png" alt="Julio Té Monta" class="hero-logo">
+                <div class="slide-logo-tagline">Julio Té Monta · Rifas y Sorteos Oficiales · República Dominicana</div>
             </div>
         </div>
 
         <!-- ══ MAIN CONTENT: KEY + TYPING (on top of background) ══ -->
         <div class="intro-content" id="slide-4">
             <!-- .intro-label injected by intro.js -->
-            <img src="images/llave.png" alt="Llave Richard y Julio Té Monta" id="intro-key">
+            <img src="images/llave.png" alt="Llave Julio Té Monta" id="intro-key">
             <div class="intro-title-wrap">
-                <h1 id="typing-text" aria-label="Richard y Julio Té Monta"></h1>
-                <span id="typing-cursor" aria-hidden="true"></span>
-            </div>
-            <div id="intro-cta">
+                <h1 id="typing-text" aria-label="Julio Té Monta"></h1>
                 <button onclick="enterSite()" class="btn btn-primary btn-lg">ACCEDER AL SITIO</button>
             </div>
         </div>
@@ -796,15 +805,21 @@
     <!-- 2. HERO -->
     <section id="hero" class="hero" style="position: relative; overflow: hidden;">
         <!-- Ticket Rain Container -->
-        <div id="ticket-rain-container" style="position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0.35;"></div>
+        <div id="ticket-rain-container"
+            style="position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0.35;"></div>
         <div class="container" style="position: relative; z-index: 1;">
-            <div class="uppercase text-gold" style="letter-spacing: 4px; margin-bottom: 0.5rem; font-size: 0.8rem; opacity: 0.8;">Rifas oficiales de confianza</div>
-            <h1 style="font-size: clamp(1.8rem, 5vw, 3.2rem); line-height: 1.1; margin-bottom: 1rem;">GANA TU PRÓXIMO <br> <span class="text-red">VEHÍCULO</span>
+            <div class="uppercase text-gold"
+                style="letter-spacing: 4px; margin-bottom: 0.5rem; font-size: 0.8rem; opacity: 0.8;">Rifas oficiales de
+                confianza</div>
+            <h1 style="font-size: clamp(1.8rem, 5vw, 3.2rem); line-height: 1.1; margin-bottom: 1rem;">GANA TU PRÓXIMO
+                <br> <span class="text-red">VEHÍCULO</span>
             </h1>
 
             <!-- Countdown Section -->
             <div class="countdown-wrapper" style="margin: 1rem auto; max-width: 400px;">
-                <div style="font-size: 0.75rem; color: var(--gold); letter-spacing: 2px; margin-bottom: 0.6rem; text-transform: uppercase; font-weight: 700; opacity: 0.9;">PRÓXIMO GRAN SORTEO: 6 DE SEPTIEMBRE</div>
+                <div
+                    style="font-size: 0.75rem; color: var(--gold); letter-spacing: 2px; margin-bottom: 0.6rem; text-transform: uppercase; font-weight: 700; opacity: 0.9;">
+                    PRÓXIMO GRAN SORTEO: 6 DE SEPTIEMBRE</div>
                 <div class="countdown-grid">
                     <div class="countdown-item">
                         <span id="days">00</span>
@@ -825,8 +840,8 @@
                 </div>
             </div>
 
-            <div class="hero-logo-wrap" style="margin: 1rem auto; max-width: 400px;">
-                <img src="images/logo.png" alt="Julio Té Monta">
+            <div class="hero-logo-wrap" style="margin: 1rem auto; max-width: 560px;">
+                <img src="images/logo.png" alt="Julio Té Monta" class="hero-logo">
                 <canvas id="snakeCanvas"></canvas>
             </div>
 
@@ -908,6 +923,9 @@
 
             <button onclick="window.location.href='Boleto.html'" class="btn btn-primary"
                 style="width:100%; padding:15px; font-size:1rem;">🎟️ COMPRAR BOLETO — RD$300</button>
+            <a href="Boleto.html" class="btn btn-secondary"
+                style="width:100%; padding:15px; font-size:0.95rem; margin-top:12px; display:inline-flex; justify-content:center;">PARTICIPAR
+                JULIO — Boletos 40,001–45,000</a>
         </div>
         </div>
 
