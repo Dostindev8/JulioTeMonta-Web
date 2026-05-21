@@ -1,24 +1,53 @@
-// main.js — Lógica general del sitio
+// ============================================================
+// main.js — Julio Té Monta · Logic Code Spot Software Solutions
+// Versión corregida: todos los bugs de GitHub Pages solucionados
+// ============================================================
+
+// ── FIX #2: enterSite() — definido y funcional ───────────────
+function enterSite() {
+    const intro = document.getElementById('intro');
+    if (!intro) return;
+
+    intro.style.transition = 'opacity 0.9s ease';
+    intro.style.opacity = '0';
+    intro.style.pointerEvents = 'none';
+
+    setTimeout(() => {
+        intro.style.display = 'none';
+        // FIX #4: Restaurar scroll del body
+        document.body.style.overflow = 'auto';
+        // Iniciar animaciones dependientes del scroll
+        initProgress();
+    }, 900);
+}
+
+// ── SNAKE LOGO ────────────────────────────────────────────────
 class SnakeLogo {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
-        this.resize();
         this.segments = [];
         this.count = 25;
+        this.resize();
         this.init();
         this.loop();
         window.addEventListener('resize', () => this.resize());
     }
+
     resize() {
-        this.canvas.width = this.canvas.parentElement.offsetWidth;
-        this.canvas.height = this.canvas.parentElement.offsetHeight;
+        const parent = this.canvas.parentElement;
+        this.canvas.width = parent.offsetWidth;
+        this.canvas.height = parent.offsetHeight;
     }
+
     init() {
+        const cx = this.canvas.width / 2;
+        const cy = this.canvas.height / 2;
         for (let i = 0; i < this.count; i++) {
-            this.segments.push({ x: this.canvas.width / 2, y: this.canvas.height / 2 });
+            this.segments.push({ x: cx, y: cy });
         }
     }
+
     loop() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.strokeStyle = 'rgba(255, 215, 0, 0.4)';
@@ -35,6 +64,7 @@ class SnakeLogo {
         this.ctx.stroke();
         requestAnimationFrame(() => this.loop());
     }
+
     updateMouse(e) {
         const rect = this.canvas.getBoundingClientRect();
         this.segments[0].x = e.clientX - rect.left;
@@ -42,135 +72,121 @@ class SnakeLogo {
     }
 }
 
+// ── COUNTERS ──────────────────────────────────────────────────
 function initCounters() {
     const counters = document.querySelectorAll('.count');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const target = parseInt(entry.target.getAttribute('data-target'));
-                let current = 0;
-                const duration = 2000;
-                const step = target / (duration / 30);
-                const timer = setInterval(() => {
-                    current += step;
-                    if (current >= target) {
-                        entry.target.innerText = target;
-                        clearInterval(timer);
-                    } else {
-                        entry.target.innerText = Math.floor(current);
-                    }
-                }, 30);
-                observer.unobserve(entry.target);
-            }
+            if (!entry.isIntersecting) return;
+            const target = parseInt(entry.target.getAttribute('data-target'), 10);
+            const duration = 2000;
+            const step = target / (duration / 30);
+            let current = 0;
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    entry.target.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    entry.target.textContent = Math.floor(current);
+                }
+            }, 30);
+            observer.unobserve(entry.target);
         });
     }, { threshold: 0.5 });
     counters.forEach(c => observer.observe(c));
 }
 
+// ── PROGRESS BARS ─────────────────────────────────────────────
 function initProgress() {
     const bars = document.querySelectorAll('.js-progress');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.width = entry.target.getAttribute('data-width');
-                observer.unobserve(entry.target);
-            }
+            if (!entry.isIntersecting) return;
+            entry.target.style.width = entry.target.getAttribute('data-width') || '0%';
+            observer.unobserve(entry.target);
         });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.3 });
     bars.forEach(b => observer.observe(b));
 }
 
-function initFAQ() {
-    document.querySelectorAll('.faq-header').forEach(header => {
-        header.addEventListener('click', () => {
-            const item = header.parentElement;
-            const isActive = item.classList.contains('active');
-            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
-            if (!isActive) item.classList.add('active');
-        });
-    });
-}
-
+// ── COUNTDOWN ─────────────────────────────────────────────────
 function initCountdown() {
-    // Set target date to September 6, 2026, at 8:00 PM
-    const nextSorteo = new Date('2026-09-06T20:00:00');
-    
+    // Fecha objetivo: 6 septiembre 2026 a las 20:00
+    const target = new Date('2026-09-06T20:00:00').getTime();
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
     function update() {
-        const now = new Date().getTime();
-        const diff = nextSorteo.getTime() - now;
-        
+        const diff = target - Date.now();
+
+        const daysEl = document.getElementById('days');
+        if (!daysEl) return;
+
         if (diff <= 0) {
-            const daysEl = document.getElementById('days');
-            if (daysEl) {
-                daysEl.innerText = "00";
-                document.getElementById('hours').innerText = "00";
-                document.getElementById('minutes').innerText = "00";
-                document.getElementById('seconds').innerText = "00";
-            }
+            ['days', 'hours', 'minutes', 'seconds'].forEach(id => {
+                document.getElementById(id).textContent = '00';
+            });
             return;
         }
 
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diff % (1000 * 60)) / 1000);
-        
-        const daysEl = document.getElementById('days');
-        if (daysEl) {
-            daysEl.innerText = d.toString().padStart(2, '0');
-            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
-            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
-            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
-        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+
+        document.getElementById('days').textContent = pad(d);
+        document.getElementById('hours').textContent = pad(h);
+        document.getElementById('minutes').textContent = pad(m);
+        document.getElementById('seconds').textContent = pad(s);
     }
-    setInterval(update, 1000);
+
     update();
+    setInterval(update, 1000);
 }
 
+// ── FIX #3: TICKET RAIN con CSS inyectado ────────────────────
 function initTicketRain() {
     const container = document.getElementById('ticket-rain-container');
     if (!container) return;
 
-    const ticketCount = window.innerWidth < 768 ? 15 : 30;
-    
-    for (let i = 0; i < ticketCount; i++) {
-        createTicket(container);
-    }
+    const count = window.innerWidth < 768 ? 14 : 28;
+    for (let i = 0; i < count; i++) createTicket(container);
 }
 
 function createTicket(container) {
     const ticket = document.createElement('div');
     ticket.className = 'falling-ticket';
-    
-    // Randomize properties
+
     const startX = Math.random() * 100;
-    const duration = 5 + Math.random() * 10;
-    const delay = Math.random() * 5;
-    const size = 8 + Math.random() * 12;
-    const rotation = Math.random() * 360;
-    
-    ticket.style.left = `${startX}%`;
-    ticket.style.width = `${size}px`;
-    ticket.style.height = `${size * 0.6}px`;
-    ticket.style.animationDuration = `${duration}s`;
-    ticket.style.animationDelay = `-${delay}s`;
-    ticket.style.setProperty('--rot', `${rotation}deg`);
-    
+    const duration = 6 + Math.random() * 10;
+    const delay = Math.random() * 8;
+    const w = 10 + Math.random() * 14;
+    const rot = Math.random() * 360;
+
+    ticket.style.cssText = `
+        left:             ${startX}%;
+        width:            ${w}px;
+        height:           ${w * 0.55}px;
+        animation-duration:  ${duration}s;
+        animation-delay:     -${delay}s;
+        --rot:            ${rot}deg;
+    `;
+
     container.appendChild(ticket);
-    
-    // Re-spawn when animation ends to keep it infinite
+
     ticket.addEventListener('animationiteration', () => {
         ticket.style.left = `${Math.random() * 100}%`;
     });
 }
 
+// ── NAVBAR ────────────────────────────────────────────────────
 function initNav() {
     const hamburger = document.getElementById('hamburgerBtn');
     const navLinks = document.getElementById('navLinks');
     const closeBtn = document.getElementById('closeMenuBtn');
-    const navItemLinks = document.querySelectorAll('.nav-item-link');
-    
-    // Toggle Menu
+    const itemLinks = document.querySelectorAll('.nav-item-link');
+
     if (hamburger) {
         hamburger.addEventListener('click', () => {
             navLinks.classList.add('active');
@@ -178,46 +194,37 @@ function initNav() {
         });
     }
 
-    // Close Menu
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeMobileMenu);
-    }
+    if (closeBtn) closeBtn.addEventListener('click', closeMobileMenu);
 
-    // Close menu when a link is clicked
-    navItemLinks.forEach(link => {
-        link.addEventListener('click', closeMobileMenu);
-    });
+    itemLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
 
-    // ── Typing Effect on Logo Click ──
+    // Typing toast en logo
     const navLogo = document.getElementById('navLogo');
     const toast = document.getElementById('logoTypingToast');
     const typingText = document.getElementById('typingTextInner');
-    let typingTimeout;
+    let toastTimer;
 
-    if (navLogo && toast) {
+    if (navLogo && toast && typingText) {
         navLogo.addEventListener('click', (e) => {
             e.preventDefault();
-            // Reset Animation
+
+            // Reset
             toast.classList.remove('show');
             typingText.style.animation = 'none';
-            
-            // Re-trigger reflow
-            void toast.offsetWidth; 
-            
-            // Start Animation
+            void toast.offsetWidth; // reflow
+
+            // Activar
             toast.classList.add('show');
-            typingText.style.animation = `typingAnim 1.5s steps(30, end) forwards, blinkCursor .75s step-end infinite`;
-            
-            // Hide after a few seconds
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
+            typingText.style.animation =
+                'typingAnim 1.5s steps(30, end) forwards, blinkCursor 0.75s step-end infinite';
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 4500);
         });
     }
 }
 
-// Global Menu Control
+// ── MOBILE MENU HELPERS ───────────────────────────────────────
 function closeMobileMenu() {
     const navLinks = document.getElementById('navLinks');
     if (navLinks) {
@@ -234,53 +241,46 @@ function toggleMenu() {
     }
 }
 
-
-
-
-
-// ── SECURITY PROTOCOL (Anti-Copy & Anti-DevTools) ──
+// ── SECURITY ──────────────────────────────────────────────────
 function initSecurity() {
-    // Disable Right Click
     document.addEventListener('contextmenu', e => e.preventDefault());
 
-    // Disable keyboard shortcuts
     document.addEventListener('keydown', e => {
-        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S, Ctrl+C
-        if (
+        const blocked =
             e.key === 'F12' ||
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-            (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'c' || e.key === 'C'))
-        ) {
-            e.preventDefault();
-            return false;
-        }
+            (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && ['U', 'S', 'C'].includes(e.key.toUpperCase()));
+
+        if (blocked) { e.preventDefault(); return false; }
     });
 
-    // Disable PrintScreen / Blur on loss of focus
-    window.addEventListener('blur', () => {
-        document.body.style.filter = 'blur(10px)';
-    });
-    window.addEventListener('focus', () => {
-        document.body.style.filter = 'none';
-    });
+    window.addEventListener('blur', () => { document.body.style.filter = 'blur(10px)'; });
+    window.addEventListener('focus', () => { document.body.style.filter = 'none'; });
 }
 
+// ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('load', () => {
     initCounters();
-    initProgress();
-    initFAQ();
     initCountdown();
     initNav();
     initSecurity();
     initTicketRain();
-    
+
+    // Snake sólo en desktop
     const snakeCanvas = document.getElementById('snakeCanvas');
     if (snakeCanvas) {
         if (window.innerWidth >= 768) {
             const snake = new SnakeLogo(snakeCanvas);
-            window.addEventListener('mousemove', (e) => snake.updateMouse(e));
+            window.addEventListener('mousemove', e => snake.updateMouse(e));
         } else {
             snakeCanvas.style.display = 'none';
         }
+    }
+
+    // Progress bars se activan en enterSite() para que esperen a que el intro cierre
+    // Si el intro no existe (por si acaso), inicializar de todas formas
+    if (!document.getElementById('intro')) {
+        document.body.style.overflow = 'auto';
+        initProgress();
     }
 });
