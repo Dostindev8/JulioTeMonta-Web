@@ -21,9 +21,9 @@
         :root {
             --gold: #ff3c3c; /* Reddish base */
             --gold-glow: #ffcc00; /* Golden glow */
-            --night-blue: #0d0d15;
+            --night-blue: #1a1a2e;
             --accent-red: #ff2a4b;
-            --dark-bg: #05050a;
+            --dark-bg: #0f0f1a;
             --light-text: #ffffff;
             --gold-light: #ff6b6b;
             --font-heading: 'Cinzel', serif;
@@ -41,7 +41,7 @@
         }
 
         body {
-            background-color: var(--dark-bg);
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%) fixed;
             color: var(--light-text);
             font-family: var(--font-body);
             line-height: 1.6;
@@ -64,17 +64,7 @@
             color: inherit;
         }
 
-        /* Canvas Background */
-        #bgCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
-        }
+
 
         /* Navbar */
         .navbar {
@@ -1429,6 +1419,35 @@
             transform: translateY(0);
         }
     </style>
+    <style id="jtm-print-styles">
+      @media print {
+        /* Ocultar TODO excepto el boleto */
+        body > *:not(#jtm-boleto-overlay) {
+          display: none !important;
+          visibility: hidden !important;
+        }
+        #jtm-boleto-overlay {
+          position: static !important;
+          background: transparent !important;
+          display: flex !important;
+          align-items: flex-start !important;
+          padding: 0 !important;
+        }
+        #jtm-card {
+          box-shadow: none !important;
+          animation: none !important;
+          max-width: 100% !important;
+          margin: 0 auto;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        #jtm-btn-close,
+        #jtm-btn-print,
+        #jtm-btn-download {
+          display: none !important;
+        }
+      }
+    </style>
 </head>
 
 <body>
@@ -1569,6 +1588,16 @@
                                     required>
                             </div>
                             <span class="error-msg">Número inválido</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="f_direccion">Dirección</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📍</span>
+                                <input type="text" id="f_direccion" class="form-input" placeholder="Ej: Calle Principal #12, Ensanche Ozama, Santo Domingo"
+                                    required autocomplete="street-address">
+                            </div>
+                            <span class="error-msg">Ingresa tu dirección</span>
                         </div>
 
                         <div class="form-group">
@@ -2329,6 +2358,7 @@
             isValid &= validateField(document.getElementById('f_nombre'), document.getElementById('f_nombre').value.trim().length >= 3);
             isValid &= validateField(cedulaIn, cedulaIn.value.replace(/\D/g, '').length === 11);
             isValid &= validateField(telIn, telIn.value.replace(/\D/g, '').length === 10);
+            isValid &= validateField(document.getElementById('f_direccion'), document.getElementById('f_direccion').value.trim().length >= 5);
 
             const correo = document.getElementById('f_correo').value;
             if (correo) isValid &= validateField(document.getElementById('f_correo'), /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo));
@@ -2358,103 +2388,408 @@
         }
 
         // ── 6. SUBMIT TO WHATSAPP & DIGITAL TICKET DISPLAY ──
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (!validateForm()) return;
-            
-            const max = parseInt(inputCant.value) || 1;
-            if (selectedNumbers.size < max) {
-                alert(`Por favor, termina de elegir tus ${max} números.`);
-                return;
-            }
+        // ════════════════════════════════════════════════════════════════
+        //  JULIO TÉ MONTA — RIFAS Y SORTEOS OFICIALES
+        //  Handler completo: Validar → Boleto → WhatsApp
+        // ════════════════════════════════════════════════════════════════
 
-            const [, pNameVal] = prizeSelect.value.split('|');
-            const cant = document.getElementById('f_cantidad').value;
-            const monto = document.getElementById('f_monto').value;
-            const numerosElegidos = document.getElementById('f_numeros').value || 'Azar';
-            
-            // Unique Registration ID
-            currentTicketId = `JTM-${Math.floor(Math.random() * 1000000)}`;
+        function handleReservarBoleto(event) {
+          if (event) event.preventDefault();
 
-            // PERSIST purchased tickets locally, which instantly deactivates them!
-            const newlyBought = Array.from(selectedNumbers);
-            locallyBought = [...locallyBought, ...newlyBought];
-            localStorage.setItem('jtm_locally_bought', JSON.stringify(locallyBought));
+          // Validate via form-validation logic (highlighting fields, check file)
+          if (!validateForm()) {
+            mostrarError("Por favor completa los campos requeridos en rojo y sube tu comprobante.");
+            return;
+          }
 
-            // Immediately mark as sold/deactivated in global pool
-            newlyBought.forEach(num => soldNumbers.add(num));
+          const nombre    = (
+            document.getElementById('f_nombre')?.value || ''
+          ).trim();
 
-            const msg = `🚀 *NUEVA COMPRA DE BOLETO* 🚀\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `👤 *Nombre:* ${document.getElementById('f_nombre').value}\n` +
-                `🪪 *Cédula:* ${document.getElementById('f_cedula').value}\n` +
-                `📱 *Teléfono:* ${document.getElementById('f_telefono').value}\n` +
-                (document.getElementById('f_correo').value ? `✉️ *Correo:* ${document.getElementById('f_correo').value}\n` : '') +
-                `━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `🎁 *Premio:* ${pNameVal}\n` +
-                `🎟️ *Boletos:* ${cant}\n` +
-                `🔢 *Números:* ${numerosElegidos}\n` +
-                `💰 *Monto Depositado:* ${monto} (RD$ 300 c/u)\n` +
-                `📄 *Comprobante Adjunto:* ${selectedFile.name}\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `📸 *Boleto Digital:* Adjunto a esta conversación (Imagen guardada en descargas)\n` +
-                `━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `_ID de Registro: ${currentTicketId}_`;
+          const telefono  = (
+            document.getElementById('f_telefono')?.value || ''
+          ).trim();
 
-            // Open WhatsApp with prefilled message
-            const wpUrl = `https://wa.me/18098280554?text=${encodeURIComponent(msg)}`;
-            window.open(wpUrl, '_blank');
+          const cedula    = (
+            document.getElementById('f_cedula')?.value || ''
+          ).trim();
 
-            // --- POPULATE FOTORREALISTA DIGITAL TICKET ---
-            document.getElementById('dt_id').innerText = currentTicketId;
-            document.getElementById('dt_premio').innerText = pNameVal;
-            document.getElementById('dt_nombre').innerText = document.getElementById('f_nombre').value;
-            document.getElementById('dt_telefono').innerText = document.getElementById('f_telefono').value;
-            document.getElementById('dt_cedula').innerText = document.getElementById('f_cedula').value;
-            
-            // Format current date nicely
-            const today = new Date();
-            const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-            const formattedDate = `${today.getDate().toString().padStart(2, '0')}-${months[today.getMonth()]}-${today.getFullYear()}`;
-            document.getElementById('dt_fecha').innerText = formattedDate;
+          const direccion = (
+            document.getElementById('f_direccion')?.value || ''
+          ).trim();
 
-            // Generate Golden Ball Chips
-            const ballsContainer = document.getElementById('dt_numbers_grid');
-            ballsContainer.innerHTML = '';
-            newlyBought.sort((a,b) => a-b).forEach(num => {
-                const ball = document.createElement('span');
-                ball.className = 'ticket-num-gold';
-                ball.innerText = num;
-                ballsContainer.appendChild(ball);
-            });
-            
-            // Open Success Overlay
-            const overlay = document.getElementById('successOverlay');
-            overlay.classList.add('active');
+          const numeros = obtenerNumerosSeleccionados();
 
-            // Auto-download ticket screenshot automatically after rendering settles
-            setTimeout(() => {
-                downloadTicketImage();
-            }, 1200);
+          // ── VALIDACIÓN COMPLETA ────────────────────────────────────
+          const camposVacios = [];
+          if (!nombre)              camposVacios.push('Nombre completo');
+          if (!telefono)            camposVacios.push('Teléfono');
+          if (!cedula)              camposVacios.push('Cédula / ID');
+          if (!direccion)           camposVacios.push('Dirección');
+          if (numeros.length === 0) camposVacios.push('Números de boleto');
 
-            // Typing Effect Logic for Luxury Header
-            setTimeout(() => {
-                typeWriter('portalTitle', '¡BOLETO GENERADO CON ÉXITO!', 40, () => {
-                    typeWriter('portalMsg', `¡Muchas gracias por participar con Julio Té Monta! Tu boleto digital ha sido emitido e inhabilitado de la tabla general. Descarga tu comprobante de imagen a continuación para tus registros personales. ¡Mucha suerte! 🍀`, 20);
-                });
-            }, 800);
+          if (camposVacios.length > 0) {
+            const msg = `Por favor completa los siguientes campos:\n• ${camposVacios.join('\n• ')}`;
+            mostrarError(msg);
+            return; // DETENER
+          }
 
-            // Timer Progress
-            const timerBar = document.getElementById('timerProgress');
-            setTimeout(() => {
-                timerBar.style.width = '0%';
-            }, 100);
+          // ── GENERAR DATOS DEL BOLETO ──────────────────────────────
+          const fechaEmision = generarFechaFormateada(); // "20-May-2026"
+          const serialJTM    = generarSerialUnico();     // "JTM-221582"
+          const numerosStr   = numeros.join(' · ');      // "40029 · 40047 · 40048"
 
-            // Auto-close after 3 minutes
-            setTimeout(() => {
-                window.location.reload();
-            }, 180000);
-        });
+          // PERSIST purchased tickets locally, which instantly deactivates them!
+          const newlyBought = numeros.map(Number);
+          locallyBought = [...locallyBought, ...newlyBought];
+          localStorage.setItem('jtm_locally_bought', JSON.stringify(locallyBought));
+
+          // Immediately mark as sold/deactivated in global pool
+          newlyBought.forEach(num => soldNumbers.add(num));
+
+          // Keep currentTicketId set for naming prints / screenshots
+          currentTicketId = serialJTM;
+
+          const datosboleto = {
+            nombre, telefono, cedula, direccion,
+            numeros, numerosStr, fechaEmision, serialJTM
+          };
+
+          // ── MOSTRAR BOLETO EN PANTALLA ────────────────────────────
+          mostrarBoletoEnPantalla(datosboleto);
+
+          // ── ENVIAR WHATSAPP A JULIO TÉ MONTA ─────────────────────
+          setTimeout(() => {
+            enviarWhatsAppJulio(datosboleto);
+          }, 800);
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        //  FUNCIÓN: Obtener números seleccionados (adaptar al código real)
+        // ════════════════════════════════════════════════════════════════
+        function obtenerNumerosSeleccionados() {
+          if (selectedNumbers && selectedNumbers.size > 0) {
+            return Array.from(selectedNumbers).map(String);
+          }
+          const inputNums = document.getElementById('f_numeros');
+          if (inputNums && inputNums.value) {
+            return inputNums.value.split(',').map(n => n.trim()).filter(Boolean);
+          }
+          return [];
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        //  FUNCIÓN: Generar fecha formateada estilo boleto oficial
+        // ════════════════════════════════════════════════════════════════
+        function generarFechaFormateada() {
+          const MESES = ['Ene','Feb','Mar','Abr','May','Jun',
+                         'Jul','Ago','Sep','Oct','Nov','Dic'];
+          const hoy = new Date();
+          const dd  = String(hoy.getDate()).padStart(2, '0');
+          const mmm = MESES[hoy.getMonth()];
+          const aaaa = hoy.getFullYear();
+          return `${dd}-${mmm}-${aaaa}`; // Ej: "20-May-2026"
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        //  FUNCIÓN: Generar serial único JTM-XXXXXX
+        // ════════════════════════════════════════════════════════════════
+        function generarSerialUnico() {
+          const ts4   = Date.now().toString().slice(-4);
+          const rand2 = Math.floor(Math.random() * 99).toString().padStart(2,'0');
+          return `JTM-${ts4}${rand2}`;
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        //  FUNCIÓN: Mostrar error al usuario
+        // ════════════════════════════════════════════════════════════════
+        function mostrarError(mensaje) {
+          alert(mensaje);
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        //  FUNCIÓN: Mostrar el boleto en pantalla (overlay)
+        // ════════════════════════════════════════════════════════════════
+        function mostrarBoletoEnPantalla(d) {
+          const existente = document.getElementById('jtm-boleto-overlay');
+          if (existente) existente.remove();
+
+          // ── Construir esferas de números de la suerte ─────────────────
+          const esferas = d.numeros.map(n => `
+            <div style="
+              width:70px; height:70px; border-radius:50%;
+              background: radial-gradient(circle at 33% 33%, #FFE566, #C8910A);
+              display:flex; align-items:center; justify-content:center;
+              font-size:13px; font-weight:900; color:#1a0800;
+              box-shadow: 0 4px 15px rgba(255,200,0,0.55), inset 0 1px 3px rgba(255,255,255,0.4);
+              flex-shrink:0;
+            ">${n}</div>
+          `).join('');
+
+          // ── Construir el overlay completo ─────────────────────────────
+          const overlay = document.createElement('div');
+          overlay.id = 'jtm-boleto-overlay';
+          overlay.style.cssText = `
+            position:fixed; inset:0;
+            background:rgba(0,0,0,0.93);
+            z-index:999999;
+            display:flex; align-items:center; justify-content:center;
+            padding:16px; box-sizing:border-box; overflow-y:auto;
+            animation: jtmFadeIn 0.3s ease;
+          `;
+
+          overlay.innerHTML = `
+            <style>
+              @keyframes jtmFadeIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+              @keyframes jtmGlow   { 0%,100%{box-shadow:0 0 30px rgba(255,200,0,0.2)} 50%{box-shadow:0 0 60px rgba(255,200,0,0.4)} }
+              #jtm-card { animation: jtmGlow 3s ease-in-out infinite; }
+              @media print {
+                body > *:not(#jtm-boleto-overlay) { display:none !important; }
+                #jtm-boleto-overlay {
+                  position:static !important; background:#fff !important;
+                  padding:0 !important; display:block !important;
+                }
+                #jtm-card {
+                  box-shadow:none !important; animation:none !important;
+                  max-width:100% !important;
+                  -webkit-print-color-adjust:exact; print-color-adjust:exact;
+                }
+                #jtm-btn-close, #jtm-btn-print, #jtm-btn-download { display:none !important; }
+              }
+            </style>
+
+            <div id="jtm-card" style="
+              background: linear-gradient(160deg, #141414 0%, #0a0a0a 60%, #111 100%);
+              border: 2.5px solid #C8910A;
+              border-radius: 22px;
+              max-width: 520px; width:100%;
+              padding: 28px 26px;
+              position:relative;
+              font-family: Georgia, 'Times New Roman', serif;
+            ">
+
+              <!-- Botón cerrar -->
+              <button id="jtm-btn-close" onclick="window.location.reload()" style="
+                position:absolute; top:14px; right:14px;
+                background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2);
+                color:#fff; font-size:16px; width:34px; height:34px;
+                border-radius:50%; cursor:pointer; display:flex;
+                align-items:center; justify-content:center;
+                transition:background 0.2s;
+              ">✕</button>
+
+              <!-- ── HEADER ─────────────────────────────────────────── -->
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <div style="color:#fff; font-size:19px; font-weight:900; letter-spacing:1.5px; font-family:Arial,sans-serif;">
+                    JULIO TÉ MONTA
+                  </div>
+                  <div style="display:flex; align-items:center; gap:5px; margin-top:3px;">
+                    <div style="width:60px; height:1px; background:#C8910A;"></div>
+                    <div style="color:#888; font-size:9.5px; letter-spacing:2px; font-family:Arial,sans-serif;">
+                      RIFAS Y SORTEOS OFICIALES
+                    </div>
+                    <div style="width:60px; height:1px; background:#C8910A;"></div>
+                  </div>
+                </div>
+                <div style="
+                  background: linear-gradient(135deg, #FFA500, #FFD700);
+                  color:#000; font-weight:900;
+                  padding:9px 18px; border-radius:30px;
+                  font-size:12px; letter-spacing:1.5px; font-family:Arial,sans-serif;
+                ">BOLETO RESERVADO</div>
+              </div>
+
+              <!-- ── SEPARADOR PUNTEADO ─────────────────────────────── -->
+              <div style="
+                border-top: 2px dashed #C8910A; margin-bottom:20px; opacity:0.55;
+              "></div>
+
+              <!-- ── TÍTULO DE LA RIFA ──────────────────────────────── -->
+              <h2 style="
+                color:#fff; text-align:center;
+                font-size:clamp(20px, 5vw, 28px);
+                font-family:Georgia,serif; font-style:italic;
+                margin:0 0 22px 0;
+                text-shadow:0 2px 15px rgba(255,200,0,0.25);
+                letter-spacing:0.5px;
+              ">Gran Rifa Villa Altagracia</h2>
+
+              <!-- ── DATOS DEL PARTICIPANTE ─────────────────────────── -->
+              <div style="
+                background:rgba(255,255,255,0.04);
+                border:1px solid rgba(200,145,10,0.25);
+                border-radius:14px; padding:20px;
+                margin-bottom:18px;
+                display:grid; grid-template-columns:1fr 1fr; gap:18px;
+              ">
+                <div>
+                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">PARTICIPANTE</div>
+                  <div style="color:#fff; font-weight:700; font-size:15px; font-family:Arial,sans-serif;">${d.nombre}</div>
+                </div>
+                <div>
+                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">TELÉFONO</div>
+                  <div style="color:#fff; font-weight:700; font-size:15px; font-family:Arial,sans-serif;">${d.telefono}</div>
+                </div>
+                <div>
+                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">CÉDULA/ID</div>
+                  <div style="color:#fff; font-weight:700; font-size:15px; font-family:Arial,sans-serif;">${d.cedula}</div>
+                </div>
+                <div>
+                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">FECHA DE EMISIÓN</div>
+                  <div style="color:#fff; font-weight:700; font-size:15px; font-family:Arial,sans-serif;">${d.fechaEmision}</div>
+                </div>
+                <div style="grid-column:1/-1;">
+                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">DIRECCIÓN</div>
+                  <div style="color:#fff; font-weight:700; font-size:14px; font-family:Arial,sans-serif;">${d.direccion}</div>
+                </div>
+              </div>
+
+              <!-- ── NÚMEROS DE LA SUERTE ───────────────────────────── -->
+              <div style="
+                background:rgba(200,145,10,0.07);
+                border:1px solid rgba(200,145,10,0.35);
+                border-radius:14px; padding:20px;
+                text-align:center; margin-bottom:18px;
+              ">
+                <div style="
+                  color:#FFD700; font-size:10px; letter-spacing:3px;
+                  font-weight:900; font-family:Arial,sans-serif;
+                  margin-bottom:16px;
+                ">NÚMEROS DE LA SUERTE</div>
+                <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
+                  ${esferas}
+                </div>
+              </div>
+
+              <!-- ── SEPARADOR PUNTEADO ─────────────────────────────── -->
+              <div style="
+                border-top:2px dashed #C8910A; margin-bottom:16px; opacity:0.45;
+              "></div>
+
+              <!-- ── FOOTER: WATERMARK + VERIFICADO + SERIAL ───────── -->
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px;">
+                <div style="
+                  font-size:26px; font-weight:900; color:#fff;
+                  opacity:0.07; letter-spacing:3px; font-family:Arial,sans-serif;
+                  user-select:none; pointer-events:none;
+                ">JULIO TÉ MONTA</div>
+                <div style="text-align:right;">
+                  <div style="
+                    display:inline-block;
+                    border:2px solid #00cc66; color:#00cc66;
+                    font-size:10px; font-weight:900;
+                    padding:5px 11px; border-radius:6px;
+                    letter-spacing:1.5px; font-family:Arial,sans-serif;
+                    margin-bottom:8px;
+                  ">✓ VERIFICADO · REGISTRO</div>
+                  <div style="
+                    color:#FFD700; font-weight:900;
+                    font-size:19px; letter-spacing:2px; font-family:Arial,sans-serif;
+                  ">${d.serialJTM}</div>
+                </div>
+              </div>
+
+              <!-- ── BOTONES DE ACCIÓN ──────────────────────────────── -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
+                <button id="jtm-btn-print" onclick="window.print()" style="
+                  padding:14px;
+                  background:linear-gradient(135deg, #C8910A, #FFD700);
+                  color:#000; border:none; border-radius:11px;
+                  font-size:13px; font-weight:900; cursor:pointer;
+                  letter-spacing:1px; font-family:Arial,sans-serif;
+                  transition:opacity 0.2s;
+                ">🖨️ IMPRIMIR</button>
+
+                <button id="jtm-btn-download" onclick="downloadTicketImage()" style="
+                  padding:14px;
+                  background:linear-gradient(135deg, #0ea5e9, #0284c7);
+                  color:#fff; border:none; border-radius:11px;
+                  font-size:13px; font-weight:900; cursor:pointer;
+                  letter-spacing:1px; font-family:Arial,sans-serif;
+                  transition:opacity 0.2s;
+                ">📸 DESCARGAR</button>
+              </div>
+
+            </div>
+          `;
+
+          document.body.appendChild(overlay);
+
+          // Scroll suave al overlay
+          setTimeout(() => overlay.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        //  FUNCIÓN: Enviar WhatsApp a Julio Té Monta
+        // ════════════════════════════════════════════════════════════════
+        function enviarWhatsAppJulio(d) {
+          const NUMERO_JULIO_WA = '18098280554';
+
+          const lineas = [
+            '🏆 *NUEVO BOLETO RESERVADO*',
+            '━━━━━━━━━━━━━━━━━━━━━',
+            '🎟️ *JULIO TÉ MONTA*',
+            '_Rifas y Sorteos Oficiales_',
+            '━━━━━━━━━━━━━━━━━━━━━',
+            '',
+            '🏡 *Gran Rifa Villa Altagracia*',
+            '',
+            '━━ 👤 DATOS DEL PARTICIPANTE ━━',
+            `📛 *Nombre:*    ${d.nombre}`,
+            `📞 *Teléfono:*  ${d.telefono}`,
+            `🪪 *Cédula/ID:* ${d.cedula}`,
+            `📍 *Dirección:* ${d.direccion}`,
+            '',
+            '━━ 🎰 NÚMEROS DE LA SUERTE ━━',
+            `🔢 *${d.numerosStr}*`,
+            `🎫 *Cant. boletos:* ${d.numeros.length}`,
+            '',
+            '━━ 🗓️ INFO DEL BOLETO ━━',
+            `📅 *Emisión:* ${d.fechaEmision}`,
+            `🔖 *Serial:*  ${d.serialJTM}`,
+            '',
+            '━━━━━━━━━━━━━━━━━━━━━',
+            '✅ *BOLETO LISTO PARA IMPRIMIR*',
+            '━━━━━━━━━━━━━━━━━━━━━'
+          ];
+
+          const mensaje = lineas.join('\n');
+          const url     = `https://wa.me/${NUMERO_JULIO_WA}?text=${encodeURIComponent(mensaje)}`;
+
+          // Abrir en nueva pestaña
+          window.open(url, '_blank');
+        }
+
+        // ── CONECTAR AL FORMULARIO / BOTÓN ────────────────────────────
+        (function conectarFormulario() {
+          const form = document.querySelector('form') ||
+                       document.getElementById('purchaseForm') ||
+                       document.getElementById('boleto-form') ||
+                       document.getElementById('form-reserva');
+
+          if (form) {
+            form.removeEventListener('submit', handleReservarBoleto);
+            form.addEventListener('submit', handleReservarBoleto);
+            return;
+          }
+
+          const btn = document.getElementById('btnSubmit')         ||
+                      document.getElementById('btn-reservar')     ||
+                      document.getElementById('btn-confirmar')    ||
+                      document.getElementById('btn-whatsapp')     ||
+                      document.querySelector('.btn-reservar')      ||
+                      document.querySelector('.btn-confirmar')     ||
+                      document.querySelector('button[type="button"]');
+
+          if (btn) {
+            btn.removeEventListener('click', handleReservarBoleto);
+            btn.addEventListener('click', handleReservarBoleto);
+            return;
+          }
+
+          console.warn('[JTM] No se encontró form ni botón de submit. Verifica los selectores.');
+        })();
 
         function typeWriter(id, text, speed, callback) {
             let i = 0;
@@ -2474,12 +2809,13 @@
 
         // ── 6.5 HIGH-FIDELITY SCREENSHOT GENERATION & DOWNLOAD ──
         function downloadTicketImage() {
-            const ticketElement = document.getElementById('renderDigitalTicket');
-            const downloadBtn = document.querySelector('.btn-download-ticket');
+            const ticketElement = document.getElementById('renderDigitalTicket') || document.getElementById('jtm-card');
+            const downloadBtn = document.querySelector('.btn-download-ticket') || document.getElementById('jtm-btn-download');
+            if (!ticketElement || !downloadBtn) return;
             
             // Visual feedback
             const originalText = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = '<span>⏳</span> GENERANDO COMPROBANTE...';
+            downloadBtn.innerHTML = '<span>⏳</span> GENERANDO...';
             downloadBtn.disabled = true;
 
             // Use html2canvas with scale 3 for maximum crisp/retina definition
