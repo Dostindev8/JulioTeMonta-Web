@@ -2030,30 +2030,12 @@
 
         // ── 2.6 LOCAL STORAGE PERSISTENCE FOR DEACTIVATING SOLD/BOUGHT TICKETS ──
         // 1. Simulate sold numbers persistently so they don't randomize on every page load
-        let simulatedSold = JSON.parse(localStorage.getItem('jtm_simulated_sold'));
-        
-        // Data Migration: Clean up old range data (500-1500) if found
-        if (simulatedSold && (simulatedSold.length === 0 || simulatedSold[0] < 40001 || simulatedSold[0] > 45000)) {
-            simulatedSold = null;
-            localStorage.removeItem('jtm_simulated_sold');
-        }
-
-        if (!simulatedSold) {
-            simulatedSold = [];
-            const soldSet = new Set();
-            while (soldSet.size < 750) {
-                soldSet.add(Math.floor(Math.random() * (45000 - 40001 + 1)) + 40001);
-            }
-            simulatedSold = Array.from(soldSet);
-            localStorage.setItem('jtm_simulated_sold', JSON.stringify(simulatedSold));
-        }
+        let simulatedSold = [];
+        localStorage.removeItem('jtm_simulated_sold');
 
         // 2. Load locally bought tickets (deactivated permanently for this user)
-        let locallyBought = JSON.parse(localStorage.getItem('jtm_locally_bought')) || [];
-        
-        // Data Migration: Filter out old range data (500-1500)
-        locallyBought = locallyBought.filter(num => num >= 40001 && num <= 45000);
-        localStorage.setItem('jtm_locally_bought', JSON.stringify(locallyBought));
+        let locallyBought = [];
+        localStorage.removeItem('jtm_locally_bought');
 
         // Combine simulated sold numbers + locally purchased numbers into a Set
         const soldNumbers = new Set([...simulatedSold, ...locallyBought]);
