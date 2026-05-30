@@ -3,6 +3,20 @@
 // Versión corregida: todos los bugs de GitHub Pages solucionados
 // ============================================================
 
+/* ══════════════════════════════════════
+   CONFIGURACIÓN — JULIO TÉ MONTA
+   Editar solo esta sección para personalizar
+   ══════════════════════════════════════ */
+const CONFIG = {
+  boletos: { inicio: 40001, fin: 40999 },
+  whatsapp: "18091234567",
+  nombreRifa: "Julio Té Monta",
+  precioBoletoPesos: 100,
+  maxBoletosPerParticipante: 10,
+  fechaSorteo: "2025-08-15",
+};
+
+
 // ── FIX #2: enterSite() — definido y funcional ───────────────
 function enterSite() {
     const intro = document.getElementById('intro');
@@ -112,8 +126,17 @@ function initProgress() {
 
 // ── COUNTDOWN ─────────────────────────────────────────────────
 function initCountdown() {
-    // Fecha objetivo: 6 septiembre 2026 a las 20:00
-    const target = new Date('2026-09-06T20:00:00').getTime();
+    const target = new Date(CONFIG.fechaSorteo + 'T20:00:00').getTime();
+
+    // Actualizar texto de fecha de sorteo dinámicamente si existe el elemento
+    const fechaTextEl = document.getElementById('sorteo-fecha-text');
+    if (fechaTextEl) {
+        const dateObj = new Date(CONFIG.fechaSorteo + 'T00:00:00');
+        const options = { day: 'numeric', month: 'long' };
+        const formattedDate = dateObj.toLocaleDateString('es-ES', options).toUpperCase();
+        fechaTextEl.textContent = `PRÓXIMO GRAN SORTEO: ${formattedDate}`;
+    }
+
 
     function pad(n) { return String(n).padStart(2, '0'); }
 

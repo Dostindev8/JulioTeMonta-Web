@@ -1459,6 +1459,140 @@
         .btn-download-ticket:active {
             transform: translateY(0);
         }
+
+        /* --- NEW PREMIUM ADDITIONS FOR SUMMARY MODAL & SEARCH ERROR --- */
+        .jtm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 15000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .jtm-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .jtm-modal-content {
+            background: var(--night-blue);
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 480px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            border: 2px solid var(--border-glow);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 60, 60, 0.15);
+        }
+
+        .jtm-modal.active .jtm-modal-content {
+            transform: translateY(0);
+        }
+
+        .jtm-modal-title {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .jtm-modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .jtm-summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .jtm-summary-label {
+            color: #888;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .jtm-summary-value {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            word-break: break-all;
+            text-align: right;
+            max-width: 70%;
+        }
+
+        .jtm-modal-footer {
+            display: flex;
+            gap: 15px;
+        }
+
+        .jtm-btn-modify {
+            background: transparent;
+            color: #aaa;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .jtm-btn-modify:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .jtm-btn-confirm {
+            margin-top: 0 !important;
+        }
+
+        .ticket-item:focus-visible {
+            outline: 2px solid var(--gold-glow);
+            outline-offset: 2px;
+            transform: scale(1.05);
+        }
+
+        /* Responsive Layouts for Summary Modal and Form Stack */
+        @media (max-width: 480px) {
+            .jtm-modal.active {
+                align-items: stretch;
+            }
+            .jtm-modal-content {
+                width: 100%;
+                height: 100%;
+                max-width: 100%;
+                border-radius: 0;
+                border: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                max-height: 100vh;
+                padding: 24px;
+            }
+            .jtm-modal-footer {
+                flex-direction: column-reverse;
+                gap: 10px;
+            }
+            
+            /* Stack tab buttons vertically if they don't fit */
+            .selector-mode-tabs {
+                flex-direction: column;
+            }
+        }
     </style>
     <style id="jtm-print-styles">
       @media print {
@@ -1639,12 +1773,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Correo Electrónico (Opcional)</label>
+                            <label class="form-label">Correo Electrónico</label>
                             <div class="input-wrapper">
                                 <span class="input-icon">✉️</span>
-                                <input type="email" id="f_correo" class="form-input" placeholder="tucorreo@ejemplo.com">
+                                <input type="email" id="f_correo" class="form-input" placeholder="tucorreo@ejemplo.com" required autocomplete="email">
                             </div>
-                            <span class="error-msg">Correo inválido</span>
+                            <span class="error-msg">Ingresa un correo electrónico válido</span>
                         </div>
 
                         <div class="form-group">
@@ -1670,8 +1804,9 @@
                                 <div id="panelManual" class="selector-panel active">
                                     <div class="ticket-grid-header">
                                         <div id="selectionStatus" style="font-size: 0.85rem; color: var(--gold);">Seleccionados: 0 / 1</div>
-                                        <div class="search-box-container">
-                                            <input type="text" id="ticketSearch" class="form-input search-input" placeholder="🔍 Buscar número (40001-45000)..." oninput="searchTicket()">
+                                        <div class="search-box-container" style="position: relative;">
+                                            <input type="text" id="ticketSearch" class="form-input search-input" placeholder="🔍 Buscar número..." style="width: 100%;">
+                                            <span id="searchErrorMsg" style="display: none; position: absolute; top: 100%; left: 0; font-size: 0.72rem; color: var(--accent-red); white-space: nowrap; z-index: 5; background: #000; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--accent-red); margin-top: 4px;"></span>
                                         </div>
                                         <div class="ticket-legend">
                                             <div class="legend-item"><span class="dot available"></span> Libre</div>
@@ -1897,6 +2032,43 @@
         </div>
     </main>
 
+    <!-- Summary Modal -->
+    <div class="jtm-modal" id="summaryModal">
+        <div class="jtm-modal-content">
+            <h2 class="jtm-modal-title">📋 RESUMEN DE TU PARTICIPACIÓN</h2>
+            <div class="jtm-modal-body">
+                <div class="jtm-summary-item">
+                    <span class="jtm-summary-label">Nombre:</span>
+                    <span class="jtm-summary-value" id="sumNombre"></span>
+                </div>
+                <div class="jtm-summary-item">
+                    <span class="jtm-summary-label">Teléfono:</span>
+                    <span class="jtm-summary-value" id="sumTelefono"></span>
+                </div>
+                <div class="jtm-summary-item">
+                    <span class="jtm-summary-label">Email:</span>
+                    <span class="jtm-summary-value" id="sumEmail"></span>
+                </div>
+                <div class="jtm-summary-item">
+                    <span class="jtm-summary-label">Boletos:</span>
+                    <span class="jtm-summary-value" id="sumBoletos"></span>
+                </div>
+                <div class="jtm-summary-item">
+                    <span class="jtm-summary-label">Total Boletos:</span>
+                    <span class="jtm-summary-value" id="sumTotalBoletos"></span>
+                </div>
+                <div class="jtm-summary-item">
+                    <span class="jtm-summary-label">Total a Depositar:</span>
+                    <span class="jtm-summary-value" id="sumTotalMonto" style="color: var(--gold-glow); font-weight: 700;"></span>
+                </div>
+            </div>
+            <div class="jtm-modal-footer">
+                <button type="button" class="btn jtm-btn-modify" onclick="cerrarSummaryModal()">MODIFICAR</button>
+                <button type="button" class="btn btn-whatsapp jtm-btn-confirm" onclick="confirmarParticipacion()">CONFIRMAR</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Success Portal Overlay -->
     <div class="success-overlay" id="successOverlay">
         <div class="success-portal-card" style="max-width: 520px;">
@@ -1991,26 +2163,50 @@
 
     <!-- LOGIC -->
     <script>
+        /* ══════════════════════════════════════
+           CONFIGURACIÓN — JULIO TÉ MONTA
+           Editar solo esta sección para personalizar
+           ══════════════════════════════════════ */
+        const CONFIG = {
+          boletos: { inicio: 40001, fin: 40999 },
+          whatsapp: "18091234567",
+          nombreRifa: "Julio Té Monta",
+          precioBoletoPesos: 100,
+          maxBoletosPerParticipante: 10,
+          fechaSorteo: "2025-08-15",
+        };
+
         // ── 2. COUNTDOWN ──
         function initCountdown() {
-            const nextSorteo = new Date('2026-09-06T20:00:00');
+            const nextSorteo = new Date(CONFIG.fechaSorteo + 'T20:00:00');
             function update() {
                 const now = new Date().getTime();
                 const diff = nextSorteo.getTime() - now;
-                if (diff < 0) return;
+                if (diff < 0) {
+                    ['days', 'hours', 'minutes', 'seconds'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.innerText = '00';
+                    });
+                    return;
+                }
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
-                document.getElementById('days').innerText = d.toString().padStart(2, '0');
-                document.getElementById('hours').innerText = h.toString().padStart(2, '0');
-                document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
-                document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+                
+                const dEl = document.getElementById('days');
+                const hEl = document.getElementById('hours');
+                const mEl = document.getElementById('minutes');
+                const sEl = document.getElementById('seconds');
+                
+                if (dEl) dEl.innerText = d.toString().padStart(2, '0');
+                if (hEl) hEl.innerText = h.toString().padStart(2, '0');
+                if (mEl) mEl.innerText = m.toString().padStart(2, '0');
+                if (sEl) sEl.innerText = s.toString().padStart(2, '0');
             }
             setInterval(update, 1000);
             update();
         }
-        initCountdown();
 
         // ── 2.5 ELEMENT SELECTORS ──
         const ticketGrid = document.getElementById('ticketGrid');
@@ -2027,54 +2223,201 @@
         let selectedNumbers = new Set();
         let activeSelectorMode = 'manual'; // 'manual' or 'auto'
         let currentTicketId = '';
+        let pendingDatosBoleto = null;
+        let searchedNumber = null;
+        let searchHighlightTimeout = null;
 
-        // ── 2.6 LOCAL STORAGE PERSISTENCE FOR DEACTIVATING SOLD/BOUGHT TICKETS ──
-        // 1. Simulate sold numbers persistently so they don't randomize on every page load
+        // ── 2.6 LOCAL STORAGE PERSISTENCE ──
         let simulatedSold = [];
-        localStorage.removeItem('jtm_simulated_sold');
+        try {
+            simulatedSold = JSON.parse(localStorage.getItem('jtm_simulated_sold')) || [];
+        } catch (e) {
+            console.error(e);
+        }
 
-        // 2. Load locally bought tickets (deactivated permanently for this user)
         let locallyBought = [];
-        localStorage.removeItem('jtm_locally_bought');
+        try {
+            locallyBought = JSON.parse(localStorage.getItem('jtm_locally_bought')) || [];
+        } catch (e) {
+            console.error(e);
+        }
 
-        // Combine simulated sold numbers + locally purchased numbers into a Set
         const soldNumbers = new Set([...simulatedSold, ...locallyBought]);
 
-        function initTickets() {
-            ticketGrid.innerHTML = '';
+        // Debounce helper
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // ── 2.6.5 VIRTUAL SCROLL GRID ──
+        function getGridCols() {
+            const gridWidth = ticketGrid.clientWidth;
+            let itemMin = 62;
+            if (window.innerWidth <= 480) {
+                itemMin = 55;
+            } else if (window.innerWidth > 768) {
+                itemMin = 72;
+            }
+            const gap = 6;
+            const cols = Math.floor((gridWidth + gap) / (itemMin + gap));
+            return Math.max(1, cols);
+        }
+
+        function updateVirtualGrid() {
+            if (!ticketGrid) return;
+            const start = CONFIG.boletos.inicio;
+            const fin = CONFIG.boletos.fin;
+            const total = fin - start + 1;
+            
+            const cols = getGridCols();
+            
+            let itemHeight = 38;
+            if (window.innerWidth <= 480) itemHeight = 34;
+            else if (window.innerWidth > 768) itemHeight = 40;
+            const gap = 6;
+            const rowHeight = itemHeight + gap;
+            
+            const totalRows = Math.ceil(total / cols);
+            const totalHeight = totalRows * rowHeight;
+            
+            let contentWrapper = ticketGrid.querySelector('.jtm-virtual-content');
+            if (!contentWrapper) {
+                ticketGrid.innerHTML = '';
+                contentWrapper = document.createElement('div');
+                contentWrapper.className = 'jtm-virtual-content';
+                contentWrapper.style.position = 'relative';
+                contentWrapper.style.width = '100%';
+                ticketGrid.appendChild(contentWrapper);
+            }
+            contentWrapper.style.height = totalHeight + 'px';
+            
+            const scrollTop = ticketGrid.scrollTop;
+            const gridHeight = ticketGrid.clientHeight;
+            
+            const startRow = Math.max(0, Math.floor(scrollTop / rowHeight));
+            const endRow = Math.min(totalRows, Math.ceil((scrollTop + gridHeight) / rowHeight));
+            
+            const bufferRows = 4;
+            let activeStartRow = Math.max(0, startRow - bufferRows);
+            let activeEndRow = Math.min(totalRows, endRow + bufferRows);
+            
+            // Guarantee that searched ticket row is rendered immediately to highlight it properly
+            if (searchedNumber !== null) {
+                const searchIndex = searchedNumber - start;
+                const searchRow = Math.floor(searchIndex / cols);
+                if (searchRow < activeStartRow) {
+                    activeStartRow = Math.max(0, searchRow - 1);
+                } else if (searchRow >= activeEndRow) {
+                    activeEndRow = Math.min(totalRows, searchRow + 2);
+                }
+            }
+            
+            const startIndex = activeStartRow * cols;
+            const endIndex = Math.min(total, activeEndRow * cols);
+            
+            const existingItems = contentWrapper.querySelectorAll('.ticket-item');
+            const activeNums = new Set();
+            for (let i = startIndex; i < endIndex; i++) {
+                activeNums.add(start + i);
+            }
+            
+            existingItems.forEach(item => {
+                const num = parseInt(item.dataset.number, 10);
+                if (!activeNums.has(num)) {
+                    item.remove();
+                }
+            });
+            
             const fragment = document.createDocumentFragment();
-            for (let i = 40001; i <= 45000; i++) {
+            const renderedNums = new Set(Array.from(contentWrapper.querySelectorAll('.ticket-item')).map(el => parseInt(el.dataset.number, 10)));
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const num = start + i;
+                if (renderedNums.has(num)) continue;
+                
                 const item = document.createElement('div');
                 item.className = 'ticket-item';
-                item.dataset.number = i;
+                item.dataset.number = num;
+                item.setAttribute('role', 'button');
+                item.setAttribute('tabindex', '0');
+                item.setAttribute('aria-label', `Boleto ${num}`);
                 
-                if (soldNumbers.has(i)) {
+                if (soldNumbers.has(num)) {
                     item.classList.add('sold');
+                    item.setAttribute('aria-disabled', 'true');
+                    item.setAttribute('tabindex', '-1');
                     item.title = 'No Disponible';
                 }
                 
-                item.innerText = i;
-                item.onclick = () => toggleTicket(i, item);
+                if (selectedNumbers.has(num)) {
+                    item.classList.add('selected');
+                    item.setAttribute('aria-pressed', 'true');
+                } else {
+                    item.setAttribute('aria-pressed', 'false');
+                }
+                
+                if (searchedNumber === num) {
+                    item.classList.add('buscado');
+                }
+                
+                item.innerText = num;
+                
+                const itemRow = Math.floor(i / cols);
+                const itemCol = i % cols;
+                
+                item.style.gridRowStart = itemRow + 1;
+                item.style.gridColumnStart = itemCol + 1;
+                
                 fragment.appendChild(item);
             }
-            ticketGrid.appendChild(fragment);
+            
+            contentWrapper.appendChild(fragment);
+            
+            contentWrapper.style.display = 'grid';
+            contentWrapper.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            contentWrapper.style.gridTemplateRows = `repeat(${totalRows}, ${itemHeight}px)`;
+            contentWrapper.style.gap = `${gap}px`;
+            ticketGrid.style.padding = '0px';
         }
 
+        // Event Delegation for Grid Click
+        function handleGridClick(e) {
+            const item = e.target.closest('.ticket-item');
+            if (!item) return;
+            const num = parseInt(item.dataset.number, 10);
+            toggleTicket(num, item);
+        }
+
+        // ── 2.7 MODE TAB SWITCHING & REAL SEARCHING ──
         function toggleTicket(num, el) {
-            if (el.classList.contains('sold')) return;
+            if (soldNumbers.has(num)) return;
             
             const max = parseInt(inputCant.value) || 1;
             
             if (selectedNumbers.has(num)) {
                 selectedNumbers.delete(num);
-                el.classList.remove('selected');
+                if (el) {
+                    el.classList.remove('selected');
+                    el.setAttribute('aria-pressed', 'false');
+                }
             } else {
                 if (selectedNumbers.size >= max) {
                     alert(`Has alcanzado el límite de ${max} boletos. Aumenta la cantidad si deseas elegir más.`);
                     return;
                 }
                 selectedNumbers.add(num);
-                el.classList.add('selected');
+                if (el) {
+                    el.classList.add('selected');
+                    el.setAttribute('aria-pressed', 'true');
+                }
             }
             updateSelectionStatus();
         }
@@ -2092,30 +2435,63 @@
                 selectionStatus.style.color = 'var(--gold)';
                 selectionStatus.style.textShadow = 'none';
             }
+            
+            updateVirtualGrid();
         }
 
-        // Reset selection if quantity changes
         inputCant.addEventListener('change', () => {
-            clearCurrentSelection();
+            let val = parseInt(inputCant.value, 10);
+            const maxLimit = CONFIG.maxBoletosPerParticipante;
+            if (isNaN(val) || val < 1) {
+                inputCant.value = 1;
+            } else if (val > maxLimit) {
+                alert(`El límite máximo es de ${maxLimit} boletos.`);
+                inputCant.value = maxLimit;
+            } else {
+                inputCant.value = val;
+            }
+            syncSelectionToCap();
         });
+
+        inputCant.addEventListener('blur', () => {
+            let val = parseInt(inputCant.value, 10);
+            const maxLimit = CONFIG.maxBoletosPerParticipante;
+            if (isNaN(val) || val < 1) {
+                inputCant.value = 1;
+            } else if (val > maxLimit) {
+                inputCant.value = maxLimit;
+            } else {
+                inputCant.value = val;
+            }
+            syncSelectionToCap();
+        });
+
+        function syncSelectionToCap() {
+            const max = parseInt(inputCant.value) || 1;
+            if (selectedNumbers.size > max) {
+                const arr = Array.from(selectedNumbers);
+                selectedNumbers.clear();
+                for (let i = 0; i < max; i++) {
+                    selectedNumbers.add(arr[i]);
+                }
+            }
+            updateSelectionStatus();
+            updatePrice();
+        }
 
         function clearCurrentSelection() {
             selectedNumbers.clear();
-            document.querySelectorAll('.ticket-item.selected').forEach(el => el.classList.remove('selected'));
             updateSelectionStatus();
-            document.getElementById('autoNumbersDisplay').innerHTML = '<span class="placeholder-text">Ningún número generado aún</span>';
+            const autoDisplay = document.getElementById('autoNumbersDisplay');
+            if (autoDisplay) {
+                autoDisplay.innerHTML = '<span class="placeholder-text">Ningún número generado aún</span>';
+            }
         }
 
-        initTickets();
-
-        // ── 2.7 MODE TAB SWITCHING & REAL SEARCHING ──
         function switchSelectorMode(mode) {
             activeSelectorMode = mode;
-            
-            // Clear current choices to prevent mixing manual & automatic selections unexpectedly
             clearCurrentSelection();
 
-            // Toggle active tabs
             const btnManual = document.getElementById('btnTabManual');
             const btnAuto = document.getElementById('btnTabAuto');
             const pManual = document.getElementById('panelManual');
@@ -2123,52 +2499,91 @@
             const helpText = document.getElementById('selectorHelpText');
 
             if (mode === 'manual') {
-                btnManual.classList.add('active');
-                btnAuto.classList.remove('active');
-                pManual.classList.add('active');
-                pAuto.classList.remove('active');
-                helpText.innerText = 'Escribe un número para buscarlo o haz clic directamente en la tabla.';
+                if (btnManual) btnManual.classList.add('active');
+                if (btnAuto) btnAuto.classList.remove('active');
+                if (pManual) pManual.classList.add('active');
+                if (pAuto) pAuto.classList.remove('active');
+                if (helpText) helpText.innerText = 'Escribe un número para buscarlo o haz clic directamente en la tabla.';
             } else {
-                btnManual.classList.remove('active');
-                btnAuto.classList.add('active');
-                pManual.classList.remove('active');
-                pAuto.classList.add('active');
-                helpText.innerText = 'Presiona el botón para generar tus números de la suerte aleatoriamente.';
+                if (btnManual) btnManual.classList.remove('active');
+                if (btnAuto) btnAuto.classList.add('active');
+                if (pManual) pManual.classList.remove('active');
+                if (pAuto) pAuto.classList.add('active');
+                if (helpText) helpText.innerText = 'Presiona el botón para generar tus números de la suerte aleatoriamente.';
             }
+            updateVirtualGrid();
         }
 
-        // Real Search Logic with smooth scrolling and high-fidelity focus glow
         function searchTicket() {
-            const queryVal = parseInt(document.getElementById('ticketSearch').value);
-            if (isNaN(queryVal) || queryVal < 40001 || queryVal > 45000) return;
-
-            const targetItem = document.querySelector(`.ticket-item[data-number="${queryVal}"]`);
-            if (targetItem) {
-                // Smooth scroll to container view
-                targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Add extreme glow/highlight
-                targetItem.style.borderColor = '#ffcc00';
-                targetItem.style.boxShadow = '0 0 20px #ffcc00';
-                targetItem.style.transform = 'scale(1.25)';
-                targetItem.style.zIndex = '10';
-
-                setTimeout(() => {
-                    targetItem.style.borderColor = '';
-                    targetItem.style.boxShadow = '';
-                    targetItem.style.transform = '';
-                    targetItem.style.zIndex = '';
-                }, 2000);
+            const searchInput = document.getElementById('ticketSearch');
+            const queryVal = parseInt(searchInput.value, 10);
+            const start = CONFIG.boletos.inicio;
+            const fin = CONFIG.boletos.fin;
+            
+            const searchError = document.getElementById('searchErrorMsg');
+            if (searchError) {
+                searchError.style.display = 'none';
             }
+            
+            if (isNaN(queryVal)) return;
+            
+            if (queryVal < start || queryVal > fin) {
+                if (searchError) {
+                    searchError.innerText = `Número fuera de rango (${start}-${fin})`;
+                    searchError.style.display = 'block';
+                }
+                return;
+            }
+            
+            if (soldNumbers.has(queryVal)) {
+                if (searchError) {
+                    searchError.innerText = `Número ${queryVal} ya reservado`;
+                    searchError.style.display = 'block';
+                }
+            }
+            
+            searchedNumber = queryVal;
+            
+            const index = queryVal - start;
+            const cols = getGridCols();
+            const row = Math.floor(index / cols);
+            
+            let itemHeight = 38;
+            if (window.innerWidth <= 480) itemHeight = 34;
+            else if (window.innerWidth > 768) itemHeight = 40;
+            const gap = 6;
+            const rowHeight = itemHeight + gap;
+            
+            const targetScrollTop = Math.max(0, row * rowHeight - (ticketGrid.clientHeight / 2) + (rowHeight / 2));
+            
+            ticketGrid.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+            
+            updateVirtualGrid();
+            
+            setTimeout(() => {
+                const targetItem = ticketGrid.querySelector(`.ticket-item[data-number="${queryVal}"]`);
+                if (targetItem) {
+                    targetItem.classList.add('buscado');
+                    clearTimeout(searchHighlightTimeout);
+                    searchHighlightTimeout = setTimeout(() => {
+                        targetItem.classList.remove('buscado');
+                        searchedNumber = null;
+                        updateVirtualGrid();
+                    }, 2000);
+                }
+            }, 300);
         }
+
+        const debouncedSearch = debounce(searchTicket, 300);
 
         // ── 2.8 AUTOMATIC GENERATION & HIGH-FIDELITY ANIMATION ──
         function generateRandomTickets() {
             const max = parseInt(inputCant.value) || 1;
+            const start = CONFIG.boletos.inicio;
+            const fin = CONFIG.boletos.fin;
             
-            // Get all available numbers
             const available = [];
-            for (let i = 40001; i <= 45000; i++) {
+            for (let i = start; i <= fin; i++) {
                 if (!soldNumbers.has(i)) {
                     available.push(i);
                 }
@@ -2180,9 +2595,10 @@
             }
 
             const autoDisplay = document.getElementById('autoNumbersDisplay');
-            autoDisplay.innerHTML = '';
+            if (autoDisplay) {
+                autoDisplay.innerHTML = '';
+            }
             
-            // Generate distinct random tickets
             const picked = [];
             const tempAvailable = [...available];
             for (let i = 0; i < max; i++) {
@@ -2190,18 +2606,19 @@
                 picked.push(tempAvailable.splice(randIndex, 1)[0]);
             }
 
-            // High fidelity rolling slot-machine animation
             let cycleCount = 0;
             const cycleInterval = setInterval(() => {
-                autoDisplay.innerHTML = '';
-                for (let k = 0; k < max; k++) {
-                    const fakeNum = Math.floor(Math.random() * (45000 - 40001 + 1)) + 40001;
-                    const chip = document.createElement('span');
-                    chip.className = 'auto-chip';
-                    chip.style.opacity = '0.7';
-                    chip.style.boxShadow = '0 0 10px rgba(255, 60, 60, 0.4)';
-                    chip.innerText = fakeNum;
-                    autoDisplay.appendChild(chip);
+                if (autoDisplay) {
+                    autoDisplay.innerHTML = '';
+                    for (let k = 0; k < max; k++) {
+                        const fakeNum = Math.floor(Math.random() * (fin - start + 1)) + start;
+                        const chip = document.createElement('span');
+                        chip.className = 'auto-chip';
+                        chip.style.opacity = '0.7';
+                        chip.style.boxShadow = '0 0 10px rgba(255, 60, 60, 0.4)';
+                        chip.innerText = fakeNum;
+                        autoDisplay.appendChild(chip);
+                    }
                 }
                 cycleCount++;
                 if (cycleCount >= 8) {
@@ -2213,23 +2630,20 @@
 
         function finalizeAutoSelection(picked) {
             const autoDisplay = document.getElementById('autoNumbersDisplay');
-            autoDisplay.innerHTML = '';
+            if (autoDisplay) {
+                autoDisplay.innerHTML = '';
+            }
 
             selectedNumbers.clear();
-            document.querySelectorAll('.ticket-item.selected').forEach(el => el.classList.remove('selected'));
-
             picked.sort((a, b) => a - b).forEach((num) => {
                 selectedNumbers.add(num);
                 
-                // Highlight inside manual grid
-                const gridItem = document.querySelector(`.ticket-item[data-number="${num}"]`);
-                if (gridItem) gridItem.classList.add('selected');
-
-                // Render beautiful golden chips
-                const chip = document.createElement('span');
-                chip.className = 'auto-chip';
-                chip.innerText = num;
-                autoDisplay.appendChild(chip);
+                if (autoDisplay) {
+                    const chip = document.createElement('span');
+                    chip.className = 'auto-chip';
+                    chip.innerText = num;
+                    autoDisplay.appendChild(chip);
+                }
             });
 
             updateSelectionStatus();
@@ -2237,37 +2651,40 @@
 
         // ── 3. DYNAMIC PRICING & PRIZE UPDATE ──
         function updatePrice() {
-            const [price, name] = prizeSelect.value.split('|');
+            const selectVal = prizeSelect.value;
+            if (!selectVal) return;
+            const [price, name] = selectVal.split('|');
+            const priceNum = parseInt(price, 10) || CONFIG.precioBoletoPesos;
             const cant = parseInt(inputCant.value) || 1;
-            const total = parseInt(price) * cant;
+            const total = priceNum * cant;
             inputMonto.value = `RD$ ${total.toLocaleString('es-DO')}`;
 
             // Update preview card
-            if (name === 'GRAN RIFA VILLA ALTAGRACIA') {
+            if (name === CONFIG.nombreRifa.toUpperCase() || name === 'GRAN RIFA VILLA ALTAGRACIA') {
                 pImg.src = 'images/RifaActual.png';
-                pName.innerText = 'GRAN RIFA VILLA ALTAGRACIA';
-                pDesc.innerText = 'Mitsubishi Fuso 2023 + Premios';
+                pName.innerText = CONFIG.nombreRifa.toUpperCase();
+                pDesc.innerText = `Mitsubishi Fuso 2023 + Premios (Sorteo: ${CONFIG.fechaSorteo})`;
             } else if (name === 'GRAN PREMIO VIP') {
                 pImg.src = 'images/Rifa.png';
                 pName.innerText = 'GRAN PREMIO VIP';
-                pDesc.innerText = 'Honda CR-V + Civic 2023';
+                pDesc.innerText = 'Honda CR-V + Civic 2023 (Finalizado)';
             } else {
                 pImg.src = 'images/Civic.png';
                 pName.innerText = 'HONDA CIVIC OFICIAL';
-                pDesc.innerText = 'Edición especial JTM';
+                pDesc.innerText = 'Edición especial JTM (Finalizado)';
             }
         }
         prizeSelect.addEventListener('change', updatePrice);
         inputCant.addEventListener('input', updatePrice);
 
-        // Parse URL params if coming from index.html
+        // Parse URL params
         const urlParams = new URLSearchParams(window.location.search);
         const urlPrize = urlParams.get('prize');
         if (urlPrize === 'FUSO') {
-            prizeSelect.value = "300|GRAN RIFA VILLA ALTAGRACIA";
+            prizeSelect.value = `${CONFIG.precioBoletoPesos}|${CONFIG.nombreRifa.toUpperCase()}`;
             updatePrice();
         } else if (urlPrize && urlPrize.includes('CIVIC')) {
-            prizeSelect.value = "300|HONDA CIVIC OFICIAL";
+            prizeSelect.value = `300|HONDA CIVIC OFICIAL`;
             updatePrice();
         }
 
@@ -2312,12 +2729,10 @@
                 reader.onload = e => { previewImg.src = e.target.result; previewCont.classList.remove('hidden'); };
                 reader.readAsDataURL(file);
             } else {
-                // PDF fallback
                 previewImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" x="20" font-size="20" fill="%23fff">PDF</text></svg>';
                 previewCont.classList.remove('hidden');
             }
 
-            // Step validation logic
             updateSteps();
         }
 
@@ -2331,15 +2746,12 @@
         });
 
         // ── 5. FORM VALIDATION & MASKS ──
-
-        // Simple Cedula mask (XXX-XXXXXXX-X)
         const cedulaIn = document.getElementById('f_cedula');
         cedulaIn.addEventListener('input', function (e) {
             let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,7})(\d{0,1})/);
             e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
         });
 
-        // Simple Phone mask
         const telIn = document.getElementById('f_telefono');
         telIn.addEventListener('input', function (e) {
             let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
@@ -2356,15 +2768,35 @@
             let isValid = true;
             isValid &= validateField(document.getElementById('f_nombre'), document.getElementById('f_nombre').value.trim().length >= 3);
             isValid &= validateField(cedulaIn, cedulaIn.value.replace(/\D/g, '').length === 11);
-            isValid &= validateField(telIn, telIn.value.replace(/\D/g, '').length === 10);
+            
+            const cleanPhone = telIn.value.replace(/\D/g, '');
+            const isValidPhone = /^(809|829|849)[0-9]{7}$/.test(cleanPhone);
+            isValid &= validateField(telIn, isValidPhone);
+            
             isValid &= validateField(document.getElementById('f_direccion'), document.getElementById('f_direccion').value.trim().length >= 5);
 
-            const correo = document.getElementById('f_correo').value;
-            if (correo) isValid &= validateField(document.getElementById('f_correo'), /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo));
+            const emailIn = document.getElementById('f_correo');
+            const cleanEmail = emailIn.value.trim();
+            const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail);
+            isValid &= validateField(emailIn, isValidEmail);
+
+            const max = parseInt(inputCant.value) || 1;
+            const hasCorrectNum = selectedNumbers.size === max;
+            const selectorGroup = document.getElementById('f_numeros').closest('.form-group');
+            const selectorError = document.getElementById('selectorErrorMsg');
+            if (selectorGroup) {
+                if (!hasCorrectNum) {
+                    selectorGroup.classList.add('has-error');
+                    if (selectorError) selectorError.style.opacity = '1';
+                    isValid = false;
+                } else {
+                    selectorGroup.classList.remove('has-error');
+                    if (selectorError) selectorError.style.opacity = '0';
+                }
+            }
 
             isValid &= validateField(fileInput, selectedFile !== null);
 
-            // Método de Pago validation
             const paymentChecked = document.querySelector('input[name="metodo_pago"]:checked') !== null;
             const paymentGroup = document.getElementById('jtm-metodo-pago-wrapper');
             const paymentError = document.getElementById('pago-error-msg');
@@ -2382,7 +2814,6 @@
             return !!isValid;
         }
 
-        // Live steps update
         form.addEventListener('input', updateSteps);
         function updateSteps() {
             const hasData = document.getElementById('f_nombre').value || document.getElementById('f_telefono').value;
@@ -2394,464 +2825,232 @@
             const l1 = document.getElementById('line1');
             const l2 = document.getElementById('line2');
 
-            if (hasData) { s1.classList.add('completed'); s2.classList.add('active'); l1.classList.add('active'); }
-            else { s1.classList.remove('completed'); s2.classList.remove('active'); l1.classList.remove('active'); }
+            if (s1 && s2 && l1) {
+                if (hasData) { s1.classList.add('completed'); s2.classList.add('active'); l1.classList.add('active'); }
+                else { s1.classList.remove('completed'); s2.classList.remove('active'); l1.classList.remove('active'); }
+            }
 
-            if (hasFile) { s2.classList.add('completed'); s3.classList.add('active'); l2.classList.add('active'); }
-            else { s2.classList.remove('completed'); s3.classList.remove('active'); l2.classList.remove('active'); }
+            if (s2 && s3 && l2) {
+                if (hasFile) { s2.classList.add('completed'); s3.classList.add('active'); l2.classList.add('active'); }
+                else { s2.classList.remove('completed'); s3.classList.remove('active'); l2.classList.remove('active'); }
+            }
         }
 
         // ── 6. SUBMIT TO WHATSAPP & DIGITAL TICKET DISPLAY ──
-        // ════════════════════════════════════════════════════════════════
-        //  JULIO TÉ MONTA — RIFAS Y SORTEOS OFICIALES
-        //  Handler completo: Validar → Boleto → WhatsApp
-        // ════════════════════════════════════════════════════════════════
-
         function handleReservarBoleto(event) {
-          if (event) event.preventDefault();
+            if (event) event.preventDefault();
 
-          // Validate via form-validation logic (highlighting fields, check file)
-          if (!validateForm()) {
-            mostrarError("Por favor completa los campos requeridos en rojo, elige un método de pago y sube tu comprobante.");
-            return;
-          }
-
-          const nombre    = (
-            document.getElementById('f_nombre')?.value || ''
-          ).trim();
-
-          const telefono  = (
-            document.getElementById('f_telefono')?.value || ''
-          ).trim();
-
-          const cedula    = (
-            document.getElementById('f_cedula')?.value || ''
-          ).trim();
-
-          const direccion = (
-            document.getElementById('f_direccion')?.value || ''
-          ).trim();
-
-          const metodoPago = document.querySelector('input[name="metodo_pago"]:checked')?.value || '';
-
-          const numeros = obtenerNumerosSeleccionados();
-
-          // ── VALIDACIÓN COMPLETA ────────────────────────────────────
-          const camposVacios = [];
-          if (!nombre)              camposVacios.push('Nombre completo');
-          if (!telefono)            camposVacios.push('Teléfono');
-          if (!cedula)              camposVacios.push('Cédula / ID');
-          if (!direccion)           camposVacios.push('Dirección');
-          if (!metodoPago)          camposVacios.push('Método de Pago');
-          if (numeros.length === 0) camposVacios.push('Números de boleto');
-
-          if (camposVacios.length > 0) {
-            const msg = `Por favor completa los siguientes campos:\n• ${camposVacios.join('\n• ')}`;
-            mostrarError(msg);
-            return; // DETENER
-          }
-
-          // ── GENERAR DATOS DEL BOLETO ──────────────────────────────
-          const fechaEmision = generarFechaFormateada(); // "20-May-2026"
-          const serialJTM    = generarSerialUnico();     // "JTM-221582"
-          const numerosStr   = numeros.join(' · ');      // "40029 · 40047 · 40048"
-          const metodoPagoStr = metodoPago === 'transferencia'
-            ? '🏦 Transferencia / Pago Móvil'
-            : '💵 Efectivo (coordinar por WhatsApp)';
-
-          // PERSIST purchased tickets locally, which instantly deactivates them!
-          const newlyBought = numeros.map(Number);
-          locallyBought = [...locallyBought, ...newlyBought];
-          localStorage.setItem('jtm_locally_bought', JSON.stringify(locallyBought));
-
-          // Immediately mark as sold/deactivated in global pool
-          newlyBought.forEach(num => soldNumbers.add(num));
-
-          // Keep currentTicketId set for naming prints / screenshots
-          currentTicketId = serialJTM;
-
-          const datosboleto = {
-            nombre, telefono, cedula, direccion,
-            numeros, numerosStr, metodoPago, metodoPagoStr,
-            fechaEmision, serialJTM
-          };
-
-          // ── MOSTRAR BOLETO EN PANTALLA ────────────────────────────
-          mostrarBoletoEnPantalla(datosboleto);
-
-          // ── ENVIAR WHATSAPP A JULIO TÉ MONTA ─────────────────────
-          setTimeout(() => {
-            enviarWhatsAppJulio(datosboleto);
-          }, 800);
-        }
-
-        // ════════════════════════════════════════════════════════════════
-        //  FUNCIÓN: Obtener números seleccionados (adaptar al código real)
-        // ════════════════════════════════════════════════════════════════
-        function obtenerNumerosSeleccionados() {
-          if (selectedNumbers && selectedNumbers.size > 0) {
-            return Array.from(selectedNumbers).map(String);
-          }
-          const inputNums = document.getElementById('f_numeros');
-          if (inputNums && inputNums.value) {
-            return inputNums.value.split(',').map(n => n.trim()).filter(Boolean);
-          }
-          return [];
-        }
-
-        // ════════════════════════════════════════════════════════════════
-        //  FUNCIÓN: Generar fecha formateada estilo boleto oficial
-        // ════════════════════════════════════════════════════════════════
-        function generarFechaFormateada() {
-          const MESES = ['Ene','Feb','Mar','Abr','May','Jun',
-                         'Jul','Ago','Sep','Oct','Nov','Dic'];
-          const hoy = new Date();
-          const dd  = String(hoy.getDate()).padStart(2, '0');
-          const mmm = MESES[hoy.getMonth()];
-          const aaaa = hoy.getFullYear();
-          return `${dd}-${mmm}-${aaaa}`; // Ej: "20-May-2026"
-        }
-
-        // ════════════════════════════════════════════════════════════════
-        //  FUNCIÓN: Generar serial único JTM-XXXXXX
-        // ════════════════════════════════════════════════════════════════
-        function generarSerialUnico() {
-          const ts4   = Date.now().toString().slice(-4);
-          const rand2 = Math.floor(Math.random() * 99).toString().padStart(2,'0');
-          return `JTM-${ts4}${rand2}`;
-        }
-
-        // ════════════════════════════════════════════════════════════════
-        //  FUNCIÓN: Mostrar error al usuario
-        // ════════════════════════════════════════════════════════════════
-        function mostrarError(mensaje) {
-          alert(mensaje);
-        }
-
-        // ════════════════════════════════════════════════════════════════
-        //  FUNCIÓN: Mostrar el boleto en pantalla (overlay)
-        // ════════════════════════════════════════════════════════════════
-        function mostrarBoletoEnPantalla(d) {
-          const existente = document.getElementById('jtm-boleto-overlay');
-          if (existente) existente.remove();
-
-          // ── Construir esferas de números de la suerte ─────────────────
-          const esferas = d.numeros.map(n => `
-            <div style="
-              width:70px; height:70px; border-radius:50%;
-              background: radial-gradient(circle at 33% 33%, #FFE566, #C8910A);
-              display:flex; align-items:center; justify-content:center;
-              font-size:13px; font-weight:900; color:#1a0800;
-              box-shadow: 0 4px 15px rgba(255,200,0,0.55), inset 0 1px 3px rgba(255,255,255,0.4);
-              flex-shrink:0;
-            ">${n}</div>
-          `).join('');
-
-          // Ícono del método de pago
-          const pagoIcono = d.metodoPago === 'transferencia'
-            ? '🏦 <strong>Transferencia / Pago Móvil</strong>'
-            : '💵 <strong>Efectivo</strong> — Julio te contactará por WhatsApp';
-
-          // ── Construir el overlay completo ─────────────────────────────
-          const overlay = document.createElement('div');
-          overlay.id = 'jtm-boleto-overlay';
-          overlay.style.cssText = `
-            position:fixed; inset:0;
-            background:rgba(0,0,0,0.93);
-            z-index:999999;
-            display:flex; align-items:center; justify-content:center;
-            padding:16px; box-sizing:border-box; overflow-y:auto;
-            animation: jtmFadeIn 0.3s ease;
-          `;
-
-          overlay.innerHTML = `
-            <style>
-              @keyframes jtmFadeIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
-              @keyframes jtmGlow   { 0%,100%{box-shadow:0 0 30px rgba(255,200,0,0.2)} 50%{box-shadow:0 0 60px rgba(255,200,0,0.4)} }
-              #jtm-card { animation: jtmGlow 3s ease-in-out infinite; }
-              @media print {
-                body > *:not(#jtm-boleto-overlay) { display:none !important; }
-                #jtm-boleto-overlay {
-                  position:static !important; background:#fff !important;
-                  padding:0 !important; display:block !important;
-                }
-                #jtm-card {
-                  box-shadow:none !important; animation:none !important;
-                  max-width:100% !important;
-                  -webkit-print-color-adjust:exact; print-color-adjust:exact;
-                }
-                #jtm-btn-close, #jtm-btn-print, #jtm-btn-download { display:none !important; }
-              }
-            </style>
-
-            <div id="jtm-card" style="
-              background: linear-gradient(160deg, #141414 0%, #0a0a0a 60%, #111 100%);
-              border: 2.5px solid #C8910A;
-              border-radius: 22px;
-              max-width: 520px; width:100%;
-              padding: 28px 26px;
-              position:relative;
-              font-family: Georgia, 'Times New Roman', serif;
-            ">
-
-              <!-- Botón cerrar -->
-              <button id="jtm-btn-close" onclick="window.location.reload()" style="
-                position:absolute; top:14px; right:14px;
-                background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2);
-                color:#fff; font-size:16px; width:34px; height:34px;
-                border-radius:50%; cursor:pointer; display:flex;
-                align-items:center; justify-content:center;
-                transition:background 0.2s;
-              ">✕</button>
-
-              <!-- ── HEADER ─────────────────────────────────────────── -->
-              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
-                <div>
-                  <div style="color:#fff; font-size:19px; font-weight:900; letter-spacing:1.5px; font-family:Arial,sans-serif;">
-                    JULIO TÉ MONTA
-                  </div>
-                  <div style="display:flex; align-items:center; gap:5px; margin-top:3px;">
-                    <div style="width:60px; height:1px; background:#C8910A;"></div>
-                    <div style="color:#888; font-size:9.5px; letter-spacing:2px; font-family:Arial,sans-serif;">
-                      RIFAS Y SORTEOS OFICIALES
-                    </div>
-                    <div style="width:60px; height:1px; background:#C8910A;"></div>
-                  </div>
-                </div>
-                <div style="
-                  background: linear-gradient(135deg, #FFA500, #FFD700);
-                  color:#000; font-weight:900;
-                  padding:9px 18px; border-radius:30px;
-                  font-size:12px; letter-spacing:1.5px; font-family:Arial,sans-serif;
-                ">BOLETO RESERVADO</div>
-              </div>
-
-              <!-- ── SEPARADOR PUNTEADO ─────────────────────────────── -->
-              <div style="
-                border-top: 2px dashed #C8910A; margin-bottom:20px; opacity:0.55;
-              "></div>
-
-              <!-- ── TÍTULO DE LA RIFA ──────────────────────────────── -->
-              <h2 style="
-                color:#fff; text-align:center;
-                font-size:clamp(20px, 5vw, 28px);
-                font-family:Georgia,serif; font-style:italic;
-                margin:0 0 22px 0;
-                text-shadow:0 2px 15px rgba(255,200,0,0.25);
-                letter-spacing:0.5px;
-              ">Gran Rifa Villa Altagracia</h2>
-
-              <!-- ── DATOS DEL PARTICIPANTE ─────────────────────────── -->
-              <div style="
-                background:rgba(255,255,255,0.04);
-                border:1px solid rgba(200,145,10,0.25);
-                border-radius:14px; padding:20px;
-                margin-bottom:18px;
-                display:grid; grid-template-columns:1fr 1fr; gap:18px;
-              ">
-                <div>
-                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">PARTICIPANTE</div>
-                  <div style="color:#fff; font-weight:700; font-size:15px; font-family:Arial,sans-serif;">${d.nombre}</div>
-                </div>
-                <div>
-                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">TELÉFONO</div>
-                  <div style="color:#fff; font-weight:700; font-size:15px; font-family:Arial,sans-serif;">${d.telefono}</div>
-                </div>
-                <div>
-                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">CÉDULA/ID</div>
-                  <div style="color:#fff; font-weight:700; font-size:15px; font-family:Arial,sans-serif;">${d.cedula}</div>
-                </div>
-                <div>
-                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">FECHA DE EMISIÓN</div>
-                  <div style="color:#fff; font-weight:700; font-size:15px; font-family:Arial,sans-serif;">${d.fechaEmision}</div>
-                </div>
-                <div style="grid-column:1/-1;">
-                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">DIRECCIÓN</div>
-                  <div style="color:#fff; font-weight:700; font-size:14px; font-family:Arial,sans-serif;">${d.direccion}</div>
-                </div>
-                <div style="grid-column:1/-1;">
-                  <div style="color:#666; font-size:9px; letter-spacing:2.5px; font-family:Arial,sans-serif; margin-bottom:5px;">MÉTODO DE PAGO</div>
-                  <div style="color:#FFD700; font-weight:700; font-size:14px; font-family:Arial,sans-serif;">${pagoIcono}</div>
-                </div>
-              </div>
-
-              <!-- ── NÚMEROS DE LA SUERTE ───────────────────────────── -->
-              <div style="
-                background:rgba(200,145,10,0.07);
-                border:1px solid rgba(200,145,10,0.35);
-                border-radius:14px; padding:20px;
-                text-align:center; margin-bottom:18px;
-              ">
-                <div style="
-                  color:#FFD700; font-size:10px; letter-spacing:3px;
-                  font-weight:900; font-family:Arial,sans-serif;
-                  margin-bottom:16px;
-                ">NÚMEROS DE LA SUERTE</div>
-                <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
-                  ${esferas}
-                </div>
-              </div>
-
-              <!-- ── SEPARADOR PUNTEADO ─────────────────────────────── -->
-              <div style="
-                border-top:2px dashed #C8910A; margin-bottom:16px; opacity:0.45;
-              "></div>
-
-              <!-- ── FOOTER: WATERMARK + VERIFICADO + SERIAL ───────── -->
-              <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:10px;">
-                <div style="
-                  font-size:26px; font-weight:900; color:#fff;
-                  opacity:0.07; letter-spacing:3px; font-family:Arial,sans-serif;
-                  user-select:none; pointer-events:none;
-                ">JULIO TÉ MONTA</div>
-                <div style="text-align:right;">
-                  <div style="
-                    display:inline-block;
-                    border:2px solid #00cc66; color:#00cc66;
-                    font-size:10px; font-weight:900;
-                    padding:5px 11px; border-radius:6px;
-                    letter-spacing:1.5px; font-family:Arial,sans-serif;
-                    margin-bottom:8px;
-                  ">✓ VERIFICADO · REGISTRO</div>
-                  <div style="
-                    color:#FFD700; font-weight:900;
-                    font-size:19px; letter-spacing:2px; font-family:Arial,sans-serif;
-                  ">${d.serialJTM}</div>
-                </div>
-              </div>
-
-              <!-- ── BOTONES DE ACCIÓN ──────────────────────────────── -->
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
-                <button id="jtm-btn-print" onclick="window.print()" style="
-                  padding:14px;
-                  background:linear-gradient(135deg, #C8910A, #FFD700);
-                  color:#000; border:none; border-radius:11px;
-                  font-size:13px; font-weight:900; cursor:pointer;
-                  letter-spacing:1px; font-family:Arial,sans-serif;
-                  transition:opacity 0.2s;
-                ">🖨️ IMPRIMIR</button>
-
-                <button id="jtm-btn-download" onclick="downloadTicketImage()" style="
-                  padding:14px;
-                  background:linear-gradient(135deg, #0ea5e9, #0284c7);
-                  color:#fff; border:none; border-radius:11px;
-                  font-size:13px; font-weight:900; cursor:pointer;
-                  letter-spacing:1px; font-family:Arial,sans-serif;
-                  transition:opacity 0.2s;
-                ">📸 DESCARGAR</button>
-              </div>
-
-            </div>
-          `;
-
-          document.body.appendChild(overlay);
-
-          // Scroll suave al overlay
-          setTimeout(() => overlay.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
-        }
-
-        // ════════════════════════════════════════════════════════════════
-        //  FUNCIÓN: Enviar WhatsApp a Julio Té Monta
-        // ════════════════════════════════════════════════════════════════
-        function enviarWhatsAppJulio(d) {
-          const NUMERO_JULIO_WA = '18098280554';
-
-          const lineas = [
-            '🏆 *NUEVO BOLETO RESERVADO*',
-            '━━━━━━━━━━━━━━━━━━━━━',
-            '🎟️ *JULIO TÉ MONTA*',
-            '_Rifas y Sorteos Oficiales_',
-            '━━━━━━━━━━━━━━━━━━━━━',
-            '',
-            '🏡 *Gran Rifa Villa Altagracia*',
-            '',
-            '━━ 👤 DATOS DEL PARTICIPANTE ━━',
-            `📛 *Nombre:*    ${d.nombre}`,
-            `📞 *Teléfono:*  ${d.telefono}`,
-            `🪪 *Cédula/ID:* ${d.cedula}`,
-            `📍 *Dirección:* ${d.direccion}`,
-            '',
-            '━━ 💳 MÉTODO DE PAGO ━━',
-            `   ${d.metodoPagoStr}`,
-            '',
-            '━━ 🎰 NÚMEROS DE LA SUERTE ━━',
-            `🔢 *${d.numerosStr}*`,
-            `🎫 *Cant. boletos:* ${d.numeros.length}`,
-            '',
-            '━━ 🗓️ INFO DEL BOLETO ━━',
-            `📅 *Emisión:* ${d.fechaEmision}`,
-            `🔖 *Serial:*  ${d.serialJTM}`,
-            '',
-            '━━━━━━━━━━━━━━━━━━━━━',
-            '✅ *BOLETO LISTO PARA IMPRIMIR*',
-            '━━━━━━━━━━━━━━━━━━━━━'
-          ];
-
-          const mensaje = lineas.join('\n');
-          const url     = `https://wa.me/${NUMERO_JULIO_WA}?text=${encodeURIComponent(mensaje)}`;
-
-          // Abrir en nueva pestaña
-          window.open(url, '_blank');
-        }
-
-        // ── CONECTAR AL FORMULARIO / BOTÓN ────────────────────────────
-        (function conectarFormulario() {
-          const form = document.querySelector('form') ||
-                       document.getElementById('purchaseForm') ||
-                       document.getElementById('boleto-form') ||
-                       document.getElementById('form-reserva');
-
-          if (form) {
-            form.removeEventListener('submit', handleReservarBoleto);
-            form.addEventListener('submit', handleReservarBoleto);
-            return;
-          }
-
-          const btn = document.getElementById('btnSubmit')         ||
-                      document.getElementById('btn-reservar')     ||
-                      document.getElementById('btn-confirmar')    ||
-                      document.getElementById('btn-whatsapp')     ||
-                      document.querySelector('.btn-reservar')      ||
-                      document.querySelector('.btn-confirmar')     ||
-                      document.querySelector('button[type="button"]');
-
-          if (btn) {
-            btn.removeEventListener('click', handleReservarBoleto);
-            btn.addEventListener('click', handleReservarBoleto);
-            return;
-          }
-
-          console.warn('[JTM] No se encontró form ni botón de submit. Verifica los selectores.');
-        })();
-
-        function typeWriter(id, text, speed, callback) {
-            let i = 0;
-            const el = document.getElementById(id);
-            el.innerHTML = '';
-            function type() {
-                if (i < text.length) {
-                    el.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else if (callback) {
-                    callback();
-                }
+            if (!validateForm()) {
+                alert("Por favor completa los campos requeridos en rojo, elige un método de pago y sube tu comprobante.");
+                return;
             }
-            type();
+
+            const nombre    = (document.getElementById('f_nombre')?.value || '').trim();
+            const telefono  = (document.getElementById('f_telefono')?.value || '').trim();
+            const cedula    = (document.getElementById('f_cedula')?.value || '').trim();
+            const direccion = (document.getElementById('f_direccion')?.value || '').trim();
+            const email     = (document.getElementById('f_correo')?.value || '').trim();
+            const metodoPago = document.querySelector('input[name="metodo_pago"]:checked')?.value || '';
+            const numeros = obtenerNumerosSeleccionados();
+
+            const fechaEmision = generarFechaFormateada();
+            const serialJTM    = generarSerialUnico();
+            const numerosStr   = numeros.join(' · ');
+            const metodoPagoStr = metodoPago === 'transferencia'
+                ? '🏦 Transferencia / Pago Móvil'
+                : '💵 Efectivo (coordinar por WhatsApp)';
+
+            const datosboleto = {
+                nombre, telefono, cedula, direccion, email,
+                numeros, numerosStr, metodoPago, metodoPagoStr,
+                fechaEmision, serialJTM
+            };
+
+            mostrarSummaryModal(datosboleto);
+        }
+
+        function obtenerNumerosSeleccionados() {
+            if (selectedNumbers && selectedNumbers.size > 0) {
+                return Array.from(selectedNumbers).map(String);
+            }
+            return [];
+        }
+
+        function generarFechaFormateada() {
+            const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+            const hoy = new Date();
+            const dd  = String(hoy.getDate()).padStart(2, '0');
+            const mmm = MESES[hoy.getMonth()];
+            const aaaa = hoy.getFullYear();
+            return `${dd}-${mmm}-${aaaa}`;
+        }
+
+        function generarSerialUnico() {
+            const ts4   = Date.now().toString().slice(-4);
+            const rand2 = Math.floor(Math.random() * 99).toString().padStart(2,'0');
+            return `JTM-${ts4}${rand2}`;
+        }
+
+        function mostrarSummaryModal(d) {
+            pendingDatosBoleto = d;
+            
+            document.getElementById('sumNombre').innerText = d.nombre;
+            document.getElementById('sumTelefono').innerText = d.telefono;
+            document.getElementById('sumEmail').innerText = d.email || 'No especificado';
+            document.getElementById('sumBoletos').innerText = d.numeros.join(', ');
+            document.getElementById('sumTotalBoletos').innerText = d.numeros.length;
+            document.getElementById('sumTotalMonto').innerText = document.getElementById('f_monto').value;
+            
+            const modal = document.getElementById('summaryModal');
+            if (modal) {
+                modal.classList.add('active');
+                modal.style.display = 'flex';
+            }
+        }
+
+        function cerrarSummaryModal() {
+            const modal = document.getElementById('summaryModal');
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
+            pendingDatosBoleto = null;
+        }
+
+        function confirmarParticipacion() {
+            if (!pendingDatosBoleto) return;
+            const d = pendingDatosBoleto;
+            
+            // PERSIST purchased tickets locally
+            const newlyBought = d.numeros.map(Number);
+            locallyBought = [...locallyBought, ...newlyBought];
+            localStorage.setItem('jtm_locally_bought', JSON.stringify(locallyBought));
+
+            // Immediately mark as sold/deactivated in global pool
+            newlyBought.forEach(num => soldNumbers.add(num));
+
+            // Keep currentTicketId set for naming prints / screenshots
+            currentTicketId = d.serialJTM;
+
+            updateVirtualGrid();
+
+            // ── MOSTRAR BOLETO EN PANTALLA ────────────────────────────
+            mostrarBoletoEnPantalla(d);
+
+            // ── ENVIAR WHATSAPP A JULIO TÉ MONTA ─────────────────────
+            enviarWhatsAppJulio(d);
+            
+            cerrarSummaryModal();
+        }
+
+        function mostrarBoletoEnPantalla(d) {
+            // Update fotorrealista ticket DOM elements
+            const dtPremio = document.getElementById('dt_premio');
+            const dtNombre = document.getElementById('dt_nombre');
+            const dtTelefono = document.getElementById('dt_telefono');
+            const dtCedula = document.getElementById('dt_cedula');
+            const dtFecha = document.getElementById('dt_fecha');
+            const dtId = document.getElementById('dt_id');
+
+            if (dtPremio) dtPremio.innerText = CONFIG.nombreRifa.toUpperCase();
+            if (dtNombre) dtNombre.innerText = d.nombre;
+            if (dtTelefono) dtTelefono.innerText = d.telefono;
+            if (dtCedula) dtCedula.innerText = d.cedula;
+            if (dtFecha) dtFecha.innerText = d.fechaEmision;
+            if (dtId) dtId.innerText = d.serialJTM;
+            
+            // Build golden balls
+            const grid = document.getElementById('dt_numbers_grid');
+            if (grid) {
+                grid.innerHTML = '';
+                d.numeros.forEach(num => {
+                    const ball = document.createElement('div');
+                    ball.className = 'ticket-num-gold';
+                    ball.innerText = num;
+                    grid.appendChild(ball);
+                });
+            }
+
+            // Set text in success modal
+            const portalTitle = document.getElementById('portalTitle');
+            const portalMsg = document.getElementById('portalMsg');
+            if (portalTitle) portalTitle.innerText = '¡RESERVA EXITOSA!';
+            if (portalMsg) portalMsg.innerText = `Tu boleto ${d.serialJTM} ha sido pre-registrado. Hemos enviado los detalles a tu WhatsApp para finalizar el pago.`;
+
+            // Open overlay
+            const successOverlay = document.getElementById('successOverlay');
+            if (successOverlay) {
+                successOverlay.classList.add('active');
+                
+                // Animate progress bar
+                const progress = document.getElementById('timerProgress');
+                if (progress) {
+                    progress.style.width = '100%';
+                    progress.style.transition = 'none';
+                    void progress.offsetWidth; // Reflow
+                    progress.style.transition = 'width 180s linear';
+                    progress.style.width = '0%';
+                }
+
+                // Auto reload page after 3 minutes (180000 ms)
+                setTimeout(() => {
+                    window.location.reload();
+                }, 180000);
+            }
+        }
+
+        function enviarWhatsAppJulio(d) {
+            const NUMERO_JULIO_WA = CONFIG.whatsapp.replace(/\D/g, '');
+
+            const lineas = [
+                '🏆 *NUEVO BOLETO RESERVADO*',
+                '━━━━━━━━━━━━━━━━━━━━━',
+                `🎟️ *${CONFIG.nombreRifa.toUpperCase()}*`,
+                '_Rifas y Sorteos Oficiales_',
+                '━━━━━━━━━━━━━━━━━━━━━',
+                '',
+                `🏡 *${CONFIG.nombreRifa}*`,
+                '',
+                '━━ 👤 DATOS DEL PARTICIPANTE ━━',
+                `📛 *Nombre:*    ${d.nombre}`,
+                `📞 *Teléfono:*  ${d.telefono}`,
+                `🪪 *Cédula/ID:* ${d.cedula}`,
+                `📍 *Dirección:* ${d.direccion}`,
+                `✉️ *Email:*     ${d.email || 'No especificado'}`,
+                '',
+                '━━ 💳 MÉTODO DE PAGO ━━',
+                `   ${d.metodoPagoStr}`,
+                '',
+                '━━ 🎰 NÚMEROS DE LA SUERTE ━━',
+                `🔢 *${d.numerosStr}*`,
+                `🎫 *Cant. boletos:* ${d.numeros.length}`,
+                `💰 *Total a pagar:* RD$ ${(d.numeros.length * CONFIG.precioBoletoPesos).toLocaleString('es-DO')}`,
+                '',
+                '━━ 🗓️ INFO DEL BOLETO ━━',
+                `📅 *Emisión:* ${d.fechaEmision}`,
+                `🔖 *Serial:*  ${d.serialJTM}`,
+                '',
+                '━━━━━━━━━━━━━━━━━━━━━',
+                '✅ *BOLETO LISTO PARA IMPRIMIR*',
+                '━━━━━━━━━━━━━━━━━━━━━'
+            ];
+
+            const mensaje = lineas.join('\n');
+            const url     = `https://wa.me/${NUMERO_JULIO_WA}?text=${encodeURIComponent(mensaje)}`;
+
+            window.open(url, '_blank');
         }
 
         // ── 6.5 HIGH-FIDELITY SCREENSHOT GENERATION & DOWNLOAD ──
         function downloadTicketImage() {
-            const ticketElement = document.getElementById('renderDigitalTicket') || document.getElementById('jtm-card');
-            const downloadBtn = document.querySelector('.btn-download-ticket') || document.getElementById('jtm-btn-download');
+            const ticketElement = document.getElementById('renderDigitalTicket');
+            const downloadBtn = document.querySelector('.btn-download-ticket');
             if (!ticketElement || !downloadBtn) return;
             
-            // Visual feedback
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = '<span>⏳</span> GENERANDO...';
             downloadBtn.disabled = true;
 
-            // Use html2canvas with scale 3 for maximum crisp/retina definition
             html2canvas(ticketElement, {
                 scale: 3,
                 useCORS: true,
@@ -2859,18 +3058,14 @@
                 logging: false,
                 allowTaint: true
             }).then(canvas => {
-                // Convert canvas to base64 data URL
                 const imgData = canvas.toDataURL('image/png');
-                
-                // Trigger standard anchor download
                 const link = document.createElement('a');
-                link.download = `Boleto_JulioTeMonta_${currentTicketId}.png`;
+                link.download = `Boleto_${CONFIG.nombreRifa.replace(/\s+/g, '_')}_${currentTicketId}.png`;
                 link.href = imgData;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
 
-                // Restore button state
                 downloadBtn.innerHTML = '<span>✓</span> ¡DESCARGADO CON ÉXITO!';
                 setTimeout(() => {
                     downloadBtn.innerHTML = originalText;
@@ -2884,7 +3079,6 @@
             });
         }
 
-        // ── 7. UTILS ──
         async function copiarCuenta(text, btn) {
             try {
                 await navigator.clipboard.writeText(text);
@@ -2898,9 +3092,57 @@
         }
 
         function guardarLocalmente() {
-            if (!validateForm()) { alert('Completa los campos obligatorios primero.'); return; }
+            if (!validateForm()) { 
+                alert('Completa los campos obligatorios primero.'); 
+                return; 
+            }
             alert('Copia de seguridad guardada en tu navegador localmente.');
         }
+
+        // ── INIT FUNCTION ──
+        function initPage() {
+            initCountdown();
+            
+            // Set dynamic max boletos value
+            if (inputCant) {
+                inputCant.min = 1;
+                inputCant.max = CONFIG.maxBoletosPerParticipante;
+            }
+
+            // Populate the active select option from CONFIG
+            if (prizeSelect && prizeSelect.options.length > 0) {
+                const activeOption = prizeSelect.options[0];
+                activeOption.value = `${CONFIG.precioBoletoPesos}|${CONFIG.nombreRifa.toUpperCase()}`;
+                activeOption.innerText = `${CONFIG.nombreRifa.toUpperCase()} — RD$${CONFIG.precioBoletoPesos}`;
+            }
+
+            // Render virtual scroll grid
+            updateVirtualGrid();
+            updateSelectionStatus();
+            updatePrice();
+
+            // Connect form submit
+            if (form) {
+                form.removeEventListener('submit', handleReservarBoleto);
+                form.addEventListener('submit', handleReservarBoleto);
+            }
+
+            // Attach delegation grid event click, scroll, and resize
+            if (ticketGrid) {
+                ticketGrid.addEventListener('click', handleGridClick);
+                ticketGrid.addEventListener('scroll', updateVirtualGrid);
+            }
+            window.addEventListener('resize', debounce(updateVirtualGrid, 150));
+
+            // Bind search input to debouncedSearch
+            const searchInput = document.getElementById('ticketSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', debouncedSearch);
+            }
+        }
+
+        // Execute init
+        window.addEventListener('load', initPage);
     </script>
 </body>
 
