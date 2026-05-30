@@ -2179,6 +2179,7 @@
         // ── 2. COUNTDOWN ──
         function initCountdown() {
             const nextSorteo = new Date(CONFIG.fechaSorteo + 'T20:00:00');
+            const interval = setInterval(update, 1000);
             function update() {
                 const now = new Date().getTime();
                 const diff = nextSorteo.getTime() - now;
@@ -2187,6 +2188,7 @@
                         const el = document.getElementById(id);
                         if (el) el.innerText = '00';
                     });
+                    clearInterval(interval);
                     return;
                 }
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -2204,8 +2206,24 @@
                 if (mEl) mEl.innerText = m.toString().padStart(2, '0');
                 if (sEl) sEl.innerText = s.toString().padStart(2, '0');
             }
-            setInterval(update, 1000);
             update();
+        }
+
+        // ── 2.2 SECURITY ──
+        function initSecurity() {
+            document.addEventListener('contextmenu', e => e.preventDefault());
+
+            document.addEventListener('keydown', e => {
+                const blocked =
+                    e.key === 'F12' ||
+                    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+                    (e.ctrlKey && ['U', 'S', 'C'].includes(e.key.toUpperCase()));
+
+                if (blocked) { e.preventDefault(); return false; }
+            });
+
+            window.addEventListener('blur', () => { document.body.style.filter = 'blur(10px)'; });
+            window.addEventListener('focus', () => { document.body.style.filter = 'none'; });
         }
 
         // ── 2.5 ELEMENT SELECTORS ──
@@ -2669,7 +2687,11 @@
 
         const telIn = document.getElementById('f_telefono');
         telIn.addEventListener('input', function (e) {
-            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.startsWith('1') && val.length > 10) {
+                val = val.slice(1);
+            }
+            let x = val.match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
             e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
         });
 
@@ -3017,6 +3039,7 @@
         // ── INIT FUNCTION ──
         function initPage() {
             initCountdown();
+            initSecurity();
             
             // Set dynamic max boletos value
             if (inputCant) {

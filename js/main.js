@@ -9,11 +9,11 @@
    ══════════════════════════════════════ */
 const CONFIG = {
   boletos: { inicio: 40001, fin: 40999 },
-  whatsapp: "18091234567",
+  whatsapp: "18098280554",
   nombreRifa: "Julio Té Monta",
-  precioBoletoPesos: 100,
-  maxBoletosPerParticipante: 10,
-  fechaSorteo: "2025-08-15",
+  precioBoletoPesos: 300,
+  maxBoletosPerParticipante: 20,
+  fechaSorteo: "2026-08-15",
 };
 
 
@@ -140,6 +140,8 @@ function initCountdown() {
 
     function pad(n) { return String(n).padStart(2, '0'); }
 
+    const interval = setInterval(update, 1000);
+
     function update() {
         const diff = target - Date.now();
 
@@ -150,6 +152,7 @@ function initCountdown() {
             ['days', 'hours', 'minutes', 'seconds'].forEach(id => {
                 document.getElementById(id).textContent = '00';
             });
+            clearInterval(interval);
             return;
         }
 
@@ -165,7 +168,6 @@ function initCountdown() {
     }
 
     update();
-    setInterval(update, 1000);
 }
 
 // ── FIX #3: TICKET RAIN con CSS inyectado ────────────────────
